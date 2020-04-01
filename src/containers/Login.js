@@ -16,7 +16,7 @@ export default function Login(props) {
   
     try {
       // await Auth.signIn(email, password); // uncomment when AWS setup is done
-      alert("Logged in");
+      props.userHasAuthenticated(true);
     } catch (e) {
       alert(e.message);
     }
