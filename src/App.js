@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 // import { Auth } from "aws-amplify"; // uncomment when AWS setup is done
@@ -32,6 +32,8 @@ function App(props) {
     // await Auth.signOut(); // uncomment when AWS setup is done
   
     userHasAuthenticated(false);
+
+    props.history.push("/login");
   }
   
   return (
@@ -65,4 +67,4 @@ function App(props) {
   );
 }
 
-export default App;
+export default withRouter(App);
