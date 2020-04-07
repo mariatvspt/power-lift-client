@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import LoaderButton from "../components/LoaderButton";
 // import { Auth } from "aws-amplify"; // uncomment when AWS setup is done
 import "./Login.css";
 
 export default function Login(props) {
+  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -13,13 +15,16 @@ export default function Login(props) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-  
+
+    setIsLoading(true);
+
     try {
       // await Auth.signIn(email, password); // uncomment when AWS setup is done
       props.userHasAuthenticated(true);
       props.history.push("/");
     } catch (e) {
       alert(e.message);
+      setIsLoading(false);
     }
   }
 
@@ -43,9 +48,15 @@ export default function Login(props) {
             type="password"
           />
         </FormGroup>
-        <Button block bsSize="large" disabled={!validateForm()} type="submit">
+        <LoaderButton
+          block
+          type="submit"
+          bsSize="large"
+          isLoading={isLoading}
+          disabled={!validateForm()}
+        >
           Login
-        </Button>
+        </LoaderButton>
       </form>
     </div>
   );
