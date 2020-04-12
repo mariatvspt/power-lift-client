@@ -14,11 +14,11 @@ export default function Routes({ appProps }) {
       <AppliedRoute path="/" exact component={Home} appProps={appProps} />
       <AppliedRoute path="/login" exact component={Login} appProps={appProps} />
       <AppliedRoute path="/signup" exact component={Signup} appProps={appProps} />
-      <Route exact path="/notes/:id">
-        <Notes />
-      </Route>
       <Route exact path="/notes/new">
         <NewNote />
+      </Route>
+      <Route exact path="/notes/:id">
+        <Notes />
       </Route>
       <Route component={NotFound} /> { /* Finally, catch all unmatched routes. Needs to be in the last line. */ }
     </Switch>
