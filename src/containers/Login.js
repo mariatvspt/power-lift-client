@@ -3,10 +3,12 @@ import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import { useFormFields } from "../libs/hooksLib";
 import { onError } from "../libs/errorLib";
+import { useAppContext } from "../libs/contextLib";
 import { Auth } from "aws-amplify";
 import "./Login.css";
 
 export default function Login(props) {
+  const { userHasAuthenticated } = useAppContext();
   const [isLoading, setIsLoading] = useState(false);
   const [fields, handleFieldChange] = useFormFields({
     email: "",
