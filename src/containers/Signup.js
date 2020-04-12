@@ -7,7 +7,7 @@ import {
 } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import { useFormFields } from "../libs/hooksLib";
-// import { Auth } from "aws-amplify"; // uncomment when AWS setup is done
+import { Auth } from "aws-amplify";
 import "./Signup.css";
 
 export default function Signup(props) {
@@ -37,15 +37,6 @@ export default function Signup(props) {
 
     setIsLoading(true);
 
-    setNewUser("test");
-
-    setIsLoading(false);
-
-    /* replace all above with code block below when AWS setup is done
-    event.preventDefault();
-
-    setIsLoading(true);
-
     try {
         const newUser = await Auth.signUp({
         username: fields.email,
@@ -57,15 +48,9 @@ export default function Signup(props) {
         alert(e.message);
         setIsLoading(false);
     }
-    */
   }
 
   async function handleConfirmationSubmit(event) {
-    event.preventDefault();
-
-    setIsLoading(true);
-
-    /* replace all above with code block below when AWS setup is done
     event.preventDefault();
 
     setIsLoading(true);
@@ -80,7 +65,6 @@ export default function Signup(props) {
         alert(e.message);
         setIsLoading(false);
     }
-    */
   }
 
   function renderConfirmationForm() {

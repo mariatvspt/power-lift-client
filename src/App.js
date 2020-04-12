@@ -3,7 +3,7 @@ import { Link, withRouter } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { onError } from "./libs/errorLib";
-// import { Auth } from "aws-amplify"; // uncomment when AWS setup is done
+import { Auth } from "aws-amplify";
 import "./App.css";
 import Routes from "./Routes";
 
@@ -17,7 +17,7 @@ function App(props) {
   
   async function onLoad() {
     try {
-      // await Auth.currentSession(); // uncomment when AWS setup is done
+      await Auth.currentSession();
       userHasAuthenticated(true);
     }
     catch(e) {
@@ -30,7 +30,7 @@ function App(props) {
   }
 
   async function handleLogout() {
-    // await Auth.signOut(); // uncomment when AWS setup is done
+    await Auth.signOut();
   
     userHasAuthenticated(false);
 

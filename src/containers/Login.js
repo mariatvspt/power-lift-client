@@ -3,7 +3,7 @@ import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import { useFormFields } from "../libs/hooksLib";
 import { onError } from "../libs/errorLib";
-// import { Auth } from "aws-amplify"; // uncomment when AWS setup is done
+import { Auth } from "aws-amplify";
 import "./Login.css";
 
 export default function Login(props) {
@@ -23,7 +23,7 @@ export default function Login(props) {
     setIsLoading(true);
 
     try {
-      // await Auth.signIn(fields.email, fields.password); // uncomment when AWS setup is done
+      await Auth.signIn(fields.email, fields.password);
       props.userHasAuthenticated(true);
       props.history.push("/");
     } catch (e) {
