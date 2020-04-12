@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import { onError } from "./libs/errorLib";
 // import { Auth } from "aws-amplify"; // uncomment when AWS setup is done
 import "./App.css";
 import Routes from "./Routes";
@@ -21,7 +22,7 @@ function App(props) {
     }
     catch(e) {
       if (e !== 'No current user') {
-        alert(e);
+        onError(e);
       }
     }
   

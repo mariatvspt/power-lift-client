@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import { useFormFields } from "../libs/hooksLib";
+import { onError } from "../libs/errorLib";
 // import { Auth } from "aws-amplify"; // uncomment when AWS setup is done
 import "./Login.css";
 
@@ -26,7 +27,7 @@ export default function Login(props) {
       props.userHasAuthenticated(true);
       props.history.push("/");
     } catch (e) {
-      alert(e.message);
+      onError(e);
       setIsLoading(false);
     }
   }
