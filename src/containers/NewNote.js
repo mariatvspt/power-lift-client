@@ -4,6 +4,7 @@ import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import { onError } from "../libs/errorLib";
 import { API } from "aws-amplify";
+import { s3Upload } from "../libs/awsLib";
 import config from "../config";
 import "./NewNote.css";
 
@@ -26,8 +27,9 @@ async function handleSubmit(event) {
 
   if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
     alert(
-      `Please pick a file smaller than ${config.MAX_ATTACHMENT_SIZE /
-        1000000} MB.`
+      `Please pick a file smaller than ${
+        config.MAX_ATTACHMENT_SIZE / 1000000
+      } MB.`
     );
     return;
   }
@@ -35,7 +37,9 @@ async function handleSubmit(event) {
   setIsLoading(true);
 
   try {
-    await createNote({ content });
+    const attachment = file.current ? await s3Upload(file.current) : null;
+
+    await createNote({ content, attachment });
     history.push("/");
   } catch (e) {
     onError(e);
