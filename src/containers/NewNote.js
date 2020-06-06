@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import { FormGroup, FormControl, ControlLabel, Tab, Tabs } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import { onError } from "../libs/errorLib";
 import { API } from "aws-amplify";
@@ -9,52 +9,34 @@ import config from "../config";
 import "./NewNote.css";
 
 export default function NewNote() {
-  const file = useRef(null);
+
   const history = useHistory();
-  const [content, setContent] = useState("");
+  const [workoutSetName, setWorkoutSetName] = useState("");
+  const [workoutName, setWorkoutName] = useState("");
+  const [workoutTime, setWorkoutTime] = useState(0);
+  const [workoutReps, setWorkoutReps] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [key, setKey] = useState('time');
   
   // const [noteResponse, setNoteResponse] = useState("");
   // useEffect(() => {
-  //   createNote().then((noteResponse) => {
+  //   createWorkout().then((noteResponse) => {
   //     setNoteResponse(noteResponse);
   //     console.log(noteResponse);
   //   });
   // });
 
   function validateForm() {
-    return content.length > 0;
-  }
-
-  function handleFileChange(event) {
-    file.current = event.target.files[0];
+    return workoutName.length > 0 && ((workoutReps.length > 0 && !isNaN(workoutReps)) || (workoutTime.length > 0 && !isNaN(workoutTime)));
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
-      alert(
-        `Please pick a file smaller than ${
-          config.MAX_ATTACHMENT_SIZE / 1000000
-        } MB.`
-      );
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      // const attachment = file.current ? await s3Upload(file.current) : null;
-      const attachment = file.current;
-
-      // createNote({ content, attachment }).then((response) => {
-      //   response.json().then((data) => {
-      //     console.log(data.express);
-      //   });
-      // });
-
-      await createNote(content);
+      await createWorkout(workoutSetName, workoutName, workoutTime, workoutReps);
 
       history.push("/");
     } catch (e) {
@@ -63,45 +45,85 @@ export default function NewNote() {
     }
   }
 
-  async function createNote(notes) {
-    // return API.post("notes", "/notes", {
-    //   body: note
-    // });
+  async function createWorkout(set, name, time, reps) {
 
-    const request = {
-      method : "post",
-      headers: {
-        "Content-Type":"application/json"
-      },
-      body: JSON.stringify({workout : notes})
-    };
+    var request = {}
+    if(time == 0) {
+      request = {
+        method: "post",
+        headers: {
+          "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+          workoutSetName: set,
+          workoutName: name,
+          workoutReps: reps
+        })
+      };
+    }
+    else {
+      request = {
+        method: "post",
+        headers: {
+          "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+          workoutSetName: set,
+          workoutName: name,
+          workoutTime: time
+        })
+      };
+    }
 
     console.log(request);
     fetch('/post_workout', request).then(response => console.log(response));
-
-    // fetch('./post_workout', request).then(res => console.log("Request complete! ", res));
-
-    // const response = await fetch('/express_backend');
-    // console.log(response);
-    // const data = await response.json();
-    // console.log(data);
-    // return data.express;
   }
 
   return (
     <div className="NewNote">
       <form onSubmit={handleSubmit}>
-        <FormGroup controlId="content">
+        <FormGroup controlId="workoutSetName">
+          <ControlLabel> Workout Set: </ControlLabel>
           <FormControl
-            value={content}
+            value={workoutSetName}
             componentClass="textarea"
-            onChange={e => setContent(e.target.value)}
+            onChange={e => setWorkoutSetName(e.target.value)}
           />
         </FormGroup>
-        <FormGroup controlId="file">
-          <ControlLabel>Attachment</ControlLabel>
-          <FormControl onChange={handleFileChange} type="file" />
+        <FormGroup controlId="workoutName">
+          <ControlLabel> Workout Name: </ControlLabel>
+          <FormControl
+            value={workoutName}
+            componentClass="textarea"
+            onChange={e => setWorkoutName(e.target.value)}
+          />
         </FormGroup>
+        <Tabs
+          id="chooseTimeMeasure"
+          activeKey={key}
+          onSelect={(k) => setKey(k)}
+        >
+          <Tab eventKey="time" title="Time">
+            <FormGroup controlId="workoutTime">
+              <ControlLabel> Workout Time (secs): </ControlLabel>
+              <FormControl
+                value={workoutTime}
+                componentClass="textarea"
+                onChange={e => setWorkoutTime(e.target.value) & setWorkoutReps(0)}
+              />
+            </FormGroup>
+          </Tab>
+          <Tab eventKey="reps" title="Reps">
+            <FormGroup controlId="workoutReps">
+              <ControlLabel> Reps: </ControlLabel>
+              <FormControl
+                value={workoutReps}
+                componentClass="textarea"
+                onChange={e => setWorkoutReps(e.target.value) & setWorkoutTime(0)}
+              />
+            </FormGroup>
+          </Tab>
+        </Tabs>
         <LoaderButton
           block
           type="submit"
