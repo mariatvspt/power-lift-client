@@ -25,21 +25,10 @@ function setWorkoutRequest(req, allSets) {
   else {
     requestSent[workoutName] = { workoutTime: req.body.workoutTime }
   }
-  
-  // adding a new set -> move to a new api
-  if(allSets.length == 0) {
-    const newSet = {}
-    newSet[workoutSetName] = requestSent;
-    allSets = {
-      workoutSets: newSet
-    };
-  }
 
   // adding to existing set
-  else {
-    allSets = JSON.parse(allSets);
-    allSets.workoutSets[workoutSetName][workoutName] = requestSent[workoutName];
-  }
+  allSets = JSON.parse(allSets);
+  allSets.workoutSets[workoutSetName][workoutName] = requestSent[workoutName];
 
   return allSets;
 }
@@ -49,13 +38,55 @@ app.get('/express_backend', (req, res) => {
   res.send({ express: 'YOUR EXPRESS BACKEND IS CONNECTED TO REACT' });
 });
 
-// Post a workout with time or rep in a given set
-app.post('/post_workout', (req, res) => {
-    try {
-      if(!fs.existsSync('./notes/posted_workout.json')) {
-        fs.writeFileSync('./notes/posted_workout.json', '');
-      }
+app.get('/view_sets', (req, res) => {
+  if(!fs.existsSync('./notes/posted_workout.json')) {
+    fs.writeFileSync('./notes/posted_workout.json', '');
+  }
 
+  var allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+  allSets = JSON.parse(allSets);
+  var workoutSets = {
+    workoutSets: Object.keys(allSets.workoutSets)
+  }
+  
+  res.send(workoutSets);
+});
+
+app.post('/new_set', (req,res) => {
+  try {
+    var allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+    allSets = JSON.parse(allSets);
+
+    if(allSets.length == 0) {
+      const newSet = {}
+      newSet[req.body.workoutSetName] = {}
+      allSets = {
+        workoutSets: newSet
+      };
+    }
+    else {
+      allSets.workoutSets[req.body.workoutSetName] = {};
+    }
+
+    fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allSets));
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Sucessfully created a new workout set!',
+      data:  req.body
+    })
+  }
+  catch(e){
+    res.status(400).json({
+      status: 400,
+      error: e.message
+    });
+  }
+});
+
+// Post a workout with time or rep in a given set
+app.post('/new_workout', (req, res) => {
+    try {
       var allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
      
       var updatedSets = setWorkoutRequest(req, allSets);
