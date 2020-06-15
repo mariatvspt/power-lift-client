@@ -38,6 +38,7 @@ app.get('/express_backend', (req, res) => {
   res.send({ express: 'YOUR EXPRESS BACKEND IS CONNECTED TO REACT' });
 });
 
+// Retrieves all the existing sets
 app.get('/view_sets', (req, res) => {
   if(!fs.existsSync('./notes/posted_workout.json')) {
     fs.writeFileSync('./notes/posted_workout.json', '');
@@ -52,6 +53,29 @@ app.get('/view_sets', (req, res) => {
   res.send(workoutSets);
 });
 
+// Retrieves all workouts in a given set
+app.get('/view_workouts', (req, res) => {
+  if(!fs.existsSync('./notes/posted_workout.json')) {
+    fs.writeFileSync('./notes/posted_workout.json', '');
+  }
+
+  var allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+  allSets = JSON.parse(allSets);
+  console.log(req.query);
+  res.send(allSets.workoutSets[req.query.set]);
+})
+
+// Retrieves the whole data
+app.get('/view_all', (req,res) => {
+  if(!fs.existsSync('./notes/posted_workout.json')) {
+    fs.writeFileSync('./notes/posted_workout.json', '');
+  }
+
+  var allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+  res.send(allData)  
+});
+
+// Post a new set
 app.post('/new_set', (req,res) => {
   try {
     var allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});

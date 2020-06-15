@@ -6,6 +6,7 @@ import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Amplify } from 'aws-amplify';
 import config from './config';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 Amplify.configure({
   Auth: {

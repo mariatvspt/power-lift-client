@@ -7,8 +7,10 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "aws-amplify": "^3.0.7",
+    "bootstrap": "^4.5.0",
+    "mdbreact": "^4.27.0",
     "react": "^16.13.1",
-    "react-bootstrap": "^0.33.1",
+    "react-bootstrap-tabs": "^1.0.2",
     "react-dom": "^16.13.1",
     "react-router-bootstrap": "^0.25.0",
     "react-router-dom": "^5.1.2",
@@ -35,5 +37,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000/"
+  "proxy": "http://localhost:5000/",
+  "devDependencies": {
+    "react-bootstrap": "^1.0.1"
+  }
 }

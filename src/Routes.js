@@ -6,6 +6,7 @@ import Login from "./containers/Login"
 import AppliedRoute from "./components/AppliedRoute";
 import Signup from "./containers/Signup";
 import NewNote from "./containers/NewNote";
+import ViewNotes from "./containers/ViewNotes";
 import Notes from "./containers/Notes";
 import Settings from "./containers/Settings";
 
@@ -21,9 +22,12 @@ export default function Routes({ appProps }) {
       <Route exact path="/notes/new">
         <NewNote />
       </Route>
-      <Route exact path="/notes/:id">
-        <Notes />
+      <Route exact path="/notes/view">
+        <ViewNotes />
       </Route>
+      {/* <Route exact path="/notes/:id">
+        <Notes />
+      </Route> */}
       <Route component={NotFound} /> { /* Finally, catch all unmatched routes. Needs to be in the last line. */ }
     </Switch>
   );

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { FormGroup, FormControl, ControlLabel, Tab, Tabs, DropdownButton, MenuItem } from "react-bootstrap";
+import { Form, FormGroup, FormControl, FormLabel, DropdownButton, Dropdown } from "react-bootstrap";
+import { Tab, Tabs } from 'react-bootstrap-tabs';
 import LoaderButton from "../components/LoaderButton";
 import { onError } from "../libs/errorLib";
 import { API } from "aws-amplify";
@@ -16,29 +17,62 @@ export default function NewNote() {
   const [workoutTime, setWorkoutTime] = useState(0);
   const [workoutReps, setWorkoutReps] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [key, setKey] = useState('time');
-  const [allSets, setAllSets] = useState({});
+  const [allSets, setAllSets] = useState([]);
   const [showInputSetName, setShowInputSetName] = useState(false);
   const [placeholder, setPlaceholder] = useState("Select");
   const [confirmSetSelection, setConfirmSetSelection] = useState(false);
+  const [confirmSetCreation, setConfirmSetCreation] = useState(false);
   const [showInputWorkout, setShowInputWorkout] = useState(false);
   
-  // const [noteResponse, setNoteResponse] = useState("");
-  // useEffect(() => {
-  //   createWorkout().then((noteResponse) => {
-  //     setNoteResponse(noteResponse);
-  //     console.log(noteResponse);
-  //   });
-  // });
+  useEffect(() => {
+    async function fetchSets() {
+      const viewSetsResponse = await fetch('/view_sets');
+      const sets = await viewSetsResponse.json();
+      setAllSets(sets.workoutSets);
+    }
+    fetchSets();
+  }, []);
 
   function validateSetForm() {
-    return workoutSetName.length > 0
+    return workoutSetName.length > 0;
   }
 
   function validateWorkoutForm() {
-    return workoutName.length > 0 && ((workoutReps.length > 0 && !isNaN(workoutReps)) || (workoutTime.length > 0 && !isNaN(workoutTime)));
+    const validateWorkoutRepsInput = workoutReps.length > 0 && !isNaN(workoutReps);
+    const validateWorkoutTimeInput = workoutTime.length > 0 && !isNaN(workoutTime);
+    return workoutName.length > 0 && ( validateWorkoutRepsInput || validateWorkoutTimeInput );
   }
 
+  function onSelectSet(e) {
+    setWorkoutSetName(e);
+    setShowInputSetName(false);
+    setConfirmSetSelection(true);
+    setShowInputWorkout(true);
+    setConfirmSetCreation(false);
+  }
+
+  function onSelectCreateNewSet(e) {
+    setWorkoutSetName("");
+    setShowInputSetName(true);
+    setConfirmSetSelection(false);
+    setShowInputWorkout(false);
+  }
+
+  function onClickCreateSetButton(e) {
+    createSet(workoutSetName, e).then(response => console.log(response));
+    setShowInputWorkout(true);
+    setConfirmSetSelection(false);
+    setShowInputSetName(false);
+    setConfirmSetCreation(true);
+    setPlaceholder(workoutSetName);
+    
+    // update allSets for DropdownButton
+    let updatedSets = [...allSets];
+    updatedSets.push(workoutSetName);
+    setAllSets(updatedSets);
+  }
+
+  // handle "Add" button when submitted
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -56,8 +90,8 @@ export default function NewNote() {
 
   // call new_workout API to create a new workout
   async function createWorkout(set, name, time, reps) {
+    let request = {};
 
-    var request = {}
     if(time == 0) {
       request = {
         method: "post",
@@ -85,34 +119,32 @@ export default function NewNote() {
       };
     }
 
-    console.log(request);
     fetch('/new_workout', request).then(response => console.log(response));
   }
 
-  // call view_sets API and display on page
+  // display all sets on page
   function viewSets() {
-    fetch('/view_sets').then(response => response.json().then(allSets => setAllSets(allSets.workoutSets)));
-    const allSetsArray = [];
-
+    let allSetsArray = [];
     for(var i = 0; i < allSets.length; i++) {
-      allSetsArray.push(<MenuItem
-        onSelect={e => setWorkoutSetName(e) & setShowInputSetName(false) & setConfirmSetSelection(true) & setShowInputWorkout(true)}
-        value={allSets[i]}
-        eventKey={allSets[i]}
-        key={"key" + i}>
-          {allSets[i]}
-        </MenuItem>
+      allSetsArray.push(
+        <Dropdown.Item
+          className="DropdownItem"
+          onSelect={e => onSelectSet(e)}
+          value={allSets[i]}
+          eventKey={allSets[i]}
+          key={"key" + i}>
+            {allSets[i]}
+          </Dropdown.Item>
       );
     }
-
     return allSetsArray;
   }
 
-  // call new_set API to reate a new set
+  // call new_set API to create a new set
   function createSet(set, event) {
     event.preventDefault();
 
-    var request = {
+    let request = {
       method: "post",
       headers: {
         "Content-Type":"application/json"
@@ -129,79 +161,90 @@ export default function NewNote() {
   return (
     <div className="NewNote">
       <form>
-        <FormGroup id="workoutSetName">
-          <ControlLabel> Workout set: </ControlLabel>
-          <div></div>
-          <DropdownButton id="dropdown" onSelect={e => setPlaceholder(e)} title={placeholder}>
+        <FormGroup className="workoutSetName">
+          <FormLabel className="FormLabel"> Workout set: </FormLabel>
+          
+          {/* Inputting Set Information */}
+          <DropdownButton size="lg" variant="outline-dark" title={placeholder} onSelect={e => setPlaceholder(e)}>
             {viewSets()}
-            <hr />
-            <MenuItem
-              as="button"
+            <Dropdown.Divider />
+            <Dropdown.Item
+              className="DropdownItem"
               eventKey="Create a new set"
-              onSelect={e => setWorkoutSetName("") & setShowInputSetName(true) & setConfirmSetSelection(false) & setShowInputWorkout(false)}>
+              onSelect={e => onSelectCreateNewSet(e)}>
                 Create a new set
-            </MenuItem>
+            </Dropdown.Item>
           </DropdownButton>
+          
+          {/* Inputting information for creating a new set */}
           { showInputSetName &&
-            <div>
-              <ControlLabel> Set Name: </ControlLabel>
+            <>
+              <FormLabel className="FormLabel"> Set Name: </FormLabel>
               <FormControl
+                className = "FormControl"
+                size="lg"
                 value={workoutSetName}
                 id="inputWorkoutSetName"
-                componentClass="textarea"
+                as="textarea"
                 onChange={e => setWorkoutSetName(e.target.value)}
               />
               <LoaderButton
-                block
                 type="submit"
-                bsSize="large"
-                bsStyle="primary"
                 disabled={!validateSetForm()}
-                onClick={e => createSet(workoutSetName, e).then(response => console.log(response) & setShowInputWorkout(true) & setConfirmSetSelection(true) & setShowInputSetName(false) & setPlaceholder(workoutSetName)) }
+                onClick={e => onClickCreateSetButton(e)}
               >
                 Create
               </LoaderButton>
-            </div>
+            </>
           }
           { confirmSetSelection && 
-            <p>
-              You've selected the workout set {workoutSetName}.
-            </p>
+            <Form.Text>
+              You've selected the workout set: {workoutSetName}.
+            </Form.Text>
+          }
+          { confirmSetCreation &&
+            <Form.Text>
+              You've created and selected the workout set: {workoutSetName}.
+            </Form.Text>
           }
         </FormGroup>
 
+        {/* Inputting Workout Information */}
         { showInputWorkout && 
-          <div>
+          <>
             <FormGroup controlId="workoutName">
-              <ControlLabel> Workout Name: </ControlLabel>
+
+              {/* Inputting Workout Name */}
+              <FormLabel className="FormLabel"> Workout Name: </FormLabel>
               <FormControl
+                className = "FormControl"
                 value={workoutName}
-                componentClass="textarea"
+                as="textarea"
                 onChange={e => setWorkoutName(e.target.value)}
               />
             </FormGroup>
-
+            
+            {/* Inputting Workout Measure */}
             <Tabs
               id="chooseTimeMeasure"
-              activeKey={key}
-              onSelect={(k) => setKey(k)}
+              defaultActiveKey="time"
             >
-              <Tab eventKey="time" title="Time">
+              <Tab eventKey="time" label="Time">
                 <FormGroup controlId="workoutTime">
-                  <ControlLabel> Workout Time (secs): </ControlLabel>
+                  <FormLabel className="FormLabel"> Workout Time (secs): </FormLabel>
                   <FormControl
                     value={workoutTime}
-                    componentClass="textarea"
+                    as="textarea"
                     onChange={e => setWorkoutTime(e.target.value) & setWorkoutReps(0)}
                   />
                 </FormGroup>
               </Tab>
-              <Tab eventKey="reps" title="Reps">
+              <Tab eventKey="reps" label="Reps">
                 <FormGroup controlId="workoutReps">
-                  <ControlLabel> Reps: </ControlLabel>
+                  <FormLabel className="FormLabel"> Reps: </FormLabel>
                   <FormControl
                     value={workoutReps}
-                    componentClass="textarea"
+                    as="textarea"
                     onChange={e => setWorkoutReps(e.target.value) & setWorkoutTime(0)}
                   />
                 </FormGroup>
@@ -210,15 +253,13 @@ export default function NewNote() {
             <LoaderButton
               block
               type="submit"
-              bsSize="large"
-              bsStyle="primary"
               isLoading={isLoading}
               disabled={!validateWorkoutForm()}
               onClick={handleSubmit}
             >
-              Create
+              Add
             </LoaderButton>
-          </div>
+          </>
         }
       </form>
     </div>

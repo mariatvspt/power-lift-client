@@ -2,6 +2,14 @@
   margin-top: 15px;
 }
 
-.App .navbar-brand {
-  font-weight: bold;
+.navbar-brand {
+  font-size: 25px !important;
+}
+
+.TopDropDown {
+  font-size: 15px !important;
+}
+
+.TopDropDownItem {
+  font-size: 15px !important;
 }

@@ -1,0 +1,18 @@
+.ViewNotes {
+    font-size: 15px;
+    color: black !important;
+}
+
+.CardHeader {
+    font-size: larger;
+    font-weight: 500 !important;
+}
+
+.Card {
+    margin-bottom: 15px;
+}
+
+.Button {
+    float: right;
+    margin-right: 3px;
+}
