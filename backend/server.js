@@ -14,9 +14,9 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 // Returns a json to save from the received post_workout API request
 function setWorkoutRequest(req, allSets) {
   
-  var requestSent = {}; 
-  var workoutSetName = req.body.workoutSetName;
-  var workoutName = req.body.workoutName;
+  let requestSent = {}; 
+  let workoutSetName = req.body.workoutSetName;
+  let workoutName = req.body.workoutName;
 
   // workoutTime or workoutReps
   if (req.body.workoutReps != null) {
@@ -44,9 +44,9 @@ app.get('/view_sets', (req, res) => {
     fs.writeFileSync('./notes/posted_workout.json', '');
   }
 
-  var allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+  let allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
   allSets = JSON.parse(allSets);
-  var workoutSets = {
+  let workoutSets = {
     workoutSets: Object.keys(allSets.workoutSets)
   }
   
@@ -59,7 +59,7 @@ app.get('/view_workouts', (req, res) => {
     fs.writeFileSync('./notes/posted_workout.json', '');
   }
 
-  var allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+  let allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
   allSets = JSON.parse(allSets);
   console.log(req.query);
   res.send(allSets.workoutSets[req.query.set]);
@@ -71,14 +71,14 @@ app.get('/view_all', (req,res) => {
     fs.writeFileSync('./notes/posted_workout.json', '');
   }
 
-  var allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+  let allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
   res.send(allData)  
 });
 
 // Post a new set
 app.post('/new_set', (req,res) => {
   try {
-    var allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+    let allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
     allSets = JSON.parse(allSets);
 
     if(allSets.length == 0) {
@@ -111,11 +111,33 @@ app.post('/new_set', (req,res) => {
 // Post a workout with time or rep in a given set
 app.post('/new_workout', (req, res) => {
     try {
-      var allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+      let allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
      
-      var updatedSets = setWorkoutRequest(req, allSets);
+      let updatedData = setWorkoutRequest(req, allData);
 
-      fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(updatedSets));
+      fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(updatedData));
+      return res.status(200).json({
+          status: 200,
+          message: 'Sucessfully posted a workout!',
+          data:  req.body
+      })
+    }
+    catch(e){
+        res.status(400).json({
+          status: 400,
+          error: e.message
+        });
+    }
+});
+
+app.post('/edit_workout', (req, res) => {
+    try {
+      let allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+     
+      let workoutSetName = req.body.workoutSetName;
+      let workoutNumber = req.body.workoutNumber;
+
+      fs.writeFileSync('./notes/posted_workout.json', JSON.stringify());
       return res.status(200).json({
           status: 200,
           message: 'Sucessfully posted a workout!',

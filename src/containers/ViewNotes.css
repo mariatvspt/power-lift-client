@@ -3,16 +3,31 @@
     color: black !important;
 }
 
-.CardHeader {
+.WorkoutHeader {
     font-size: larger;
     font-weight: 500 !important;
 }
 
-.Card {
+.WorkoutCard {
     margin-bottom: 15px;
 }
 
-.Button {
+.CancelEditButton {
+    margin-right: 5px;
+    float: right;
+}
+
+.DoneEditButton {
+    float: right;
+}
+
+.ModifyWorkoutButton {
     float: right;
     margin-right: 3px;
+}
+
+.NoWorkoutToDisplayText {
+    font-style: italic;
+    text-align: center;
+    margin-top: 100px;
 }
