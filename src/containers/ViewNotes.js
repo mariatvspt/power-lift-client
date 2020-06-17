@@ -100,7 +100,7 @@ export default function ViewNotes() {
                                 <Button className="ModifyWorkoutButton" variant="danger" key={"DeleteButton"+i}> Delete Workout
                                     <MDBIcon icon="trash" className="ml-2"/>
                                 </Button>
-                                <Button className="ModifyWorkoutButton" variant="primary" key={"EditButton"+i} value={i} onClick={e => editWorkout(set, measureType, workoutName, workoutMeasure[measureType], e.target.value)}>
+                                <Button className="ModifyWorkoutButton" variant="primary" key={"EditButton"+i} value={i} onClick={e => editWorkout(set, measureType, workoutName, workoutMeasure, e.target.value)}>
                                     Edit Workout
                                     <MDBIcon icon="edit" className="ml-2"/>
                                 </Button>
@@ -162,17 +162,25 @@ export default function ViewNotes() {
 
     // Rest after user finish editing
     function doneEditing(set, num) {
+        let updatedWorkouts = {...allData};
+        let updatedWorkout = {};
+
+        if(updatedWorkoutMeasureType == "workoutReps")
+        updatedWorkout = {
+            workoutName: updatedWorkoutName,
+            workoutReps: updatedWorkoutMeasure
+        }
+        else if(updatedWorkoutMeasureType == "workoutTime")
+        updatedWorkout = {
+            workoutName: updatedWorkoutName,
+            workoutTime: updatedWorkoutMeasure
+        }
+
+        updatedWorkouts[set].splice(num, 1) // delete original workout
+        updatedWorkouts[set].splice(num, 0, updatedWorkout); // insert new workout
+
         setEditWorkoutField(-1);
-        let oldSets = [...allSets];
-        let oldWorkoutName = oldSets[num];
-
-        let updatedWorkouts = {... allData};
-        // updatedWorkouts[set].delete(oldWorkoutName);
-        updatedWorkouts[set][updatedWorkoutName] = {};
-        // updatedWorkouts[set][updatedWorkoutName] = updatedWorkoutMeasureType;
-        // updatedWorkouts[set][updatedWorkoutName][updatedWorkoutMeasureType] = updatedWorkoutMeasure;
-
-        console.log(updatedWorkouts);
+        setAllData(updatedWorkouts);
     }
 
     // calls API when user done editing
@@ -180,7 +188,7 @@ export default function ViewNotes() {
         doneEditing(set, num);
 
         let request = {};
-        if(updatedWorkoutMeasureType == "workoutTime") {
+        if(updatedWorkoutMeasureType == "workoutReps") {
             request = {
                 method: "post",
                 headers: {
@@ -188,29 +196,29 @@ export default function ViewNotes() {
                 },
                 body: JSON.stringify({
                 workoutSetName: set,
-                workoutNumber: num,
-                workoutName: updatedWorkoutName,
-                workoutTime: updatedWorkoutMeasure
-                })
-            };
-        }
-        else if(updatedWorkoutMeasureType == "workoutReps") {
-            request = {
-                method: "post",
-                headers: {
-                "Content-Type":"application/json"
-                },
-                body: JSON.stringify({
-                workoutSetName: set,
-                workoutNumber: num,
+                workoutIndex: num,
                 workoutName: updatedWorkoutName,
                 workoutReps: updatedWorkoutMeasure
                 })
             };
         }
+        else if(updatedWorkoutMeasureType == "workoutTime") {
+            request = {
+                method: "post",
+                headers: {
+                "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                workoutSetName: set,
+                workoutIndex: num,
+                workoutName: updatedWorkoutName,
+                workoutTime: updatedWorkoutMeasure
+                })
+            };
+        }
       
         console.log(request);
-        // fetch
+        fetch('/edit_workout', request).then(response => console.log(response));
     }
 
   return (

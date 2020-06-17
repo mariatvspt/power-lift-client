@@ -64,6 +64,7 @@ app.get('/view_workouts', (req, res) => {
 
   let allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
   allSets = JSON.parse(allSets);
+
   res.send(allSets.workoutSets[req.query.set]);
 })
 
@@ -74,6 +75,7 @@ app.get('/view_all', (req,res) => {
   }
 
   let allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+  
   res.send(allData)  
 });
 
@@ -135,11 +137,30 @@ app.post('/new_workout', (req, res) => {
 app.post('/edit_workout', (req, res) => {
     try {
       let allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
-     
-      let workoutSetName = req.body.workoutSetName;
-      let workoutNumber = req.body.workoutNumber;
+      allData = JSON.parse(allData);
 
-      fs.writeFileSync('./notes/posted_workout.json', JSON.stringify());
+      let workoutSetName = req.body.workoutSetName;
+      let workoutIndex = req.body.workoutIndex;
+      let workoutName = req.body.workoutName;
+      let updatedWorkout = {};
+      
+      if(req.body.workoutReps) {
+        updatedWorkout = {
+          workoutName: workoutName,
+          workoutReps: req.body.workoutReps
+        }
+      }
+      else if(req.body.workoutTime) {
+        updatedWorkout = {
+          workoutName: workoutName,
+          workoutTime: req.body.workoutTime
+        }
+      }
+
+      allData.workoutSets[workoutSetName].splice(workoutIndex, 1); // delete original workout
+      allData.workoutSets[workoutSetName].splice(workoutIndex, 0, updatedWorkout); // insert new workout
+
+      fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allData));
       return res.status(200).json({
           status: 200,
           message: 'Sucessfully posted a workout!',
