@@ -92,7 +92,7 @@ export default function NewNote() {
   async function createWorkout(set, name, time, reps) {
     let request = {};
 
-    if(time == 0) {
+    if(!time) {
       request = {
         method: "post",
         headers: {

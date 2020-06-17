@@ -6,11 +6,13 @@ import { selectInput } from "aws-amplify";
 import "./ViewNotes.css"
 
 export default function ViewNotes() {
-    const [allSets, setAllSets] = useState({});
+    const [allSets, setAllSets] = useState([]);
     const [allData, setAllData] = useState({});
     const [key, setKey] = useState("");
     const [EditWorkoutField, setEditWorkoutField] = useState(-1);
     const [updatedWorkoutName, setUpdatedWorkoutName] = useState("");
+    const [updatedWorkoutMeasure, setUpdatedWorkoutMeasure] = useState(0);
+    const [updatedWorkoutMeasureType, setUpdatedWorkoutMeasureType] = useState("");
     const [DropDownTitle, setDropDownTitle] = useState("");
     const [workoutMeasurePlaceholder, setWorkoutMeasurePlaceholder] = useState("");
     const [units, setUnits] = useState("");
@@ -47,6 +49,7 @@ export default function ViewNotes() {
             setWorkoutMeasurePlaceholder("Edit number of reps");
             setUnits("reps")
         }
+        setUpdatedWorkoutMeasureType(e);
     }
 
     // display all sets as NavItem
@@ -65,31 +68,39 @@ export default function ViewNotes() {
     // display all workouts in a set as Card
     function viewWorkouts(set) {
         let allWorkoutsArray = [];
-        let workouts = Object.keys(allData[set]);
+        let workouts = allData[set];
 
         if(workouts.length == 0) {
             return <p className="NoWorkoutToDisplayText"> No workouts have been added to this set. </p>
         }
         
         for(var i=0; i < workouts.length; i++) {
-            const workoutName = workouts[i];
-            const workoutMeasure = allData[set][workoutName];
-            const measureType = Object.keys(workoutMeasure)[0];
+            const workoutName = workouts[i].workoutName;
+            let measureType = "";
+            let workoutMeasure = "";
+
+            if(workouts[i].workoutTime) {
+                measureType = "workoutTime";
+                workoutMeasure = workouts[i].workoutTime;
+            }
+            else if(workouts[i].workoutReps) {
+                measureType = "workoutReps";
+                workoutMeasure = workouts[i].workoutReps;
+            }
             
             allWorkoutsArray.push(
                 <Card className="WorkoutCard" key={"WorkoutCardKey"+i}>
                     <Card.Header className="WorkoutHeader" key={"CardHeaderKey"+i}>
-                        {console.log(EditWorkoutField + " " + i)}
                         { EditWorkoutField == i
                             ? <>
                                 <Form.Control placeholder="Edit Workout Name" defaultValue={workoutName} key={"EditWorkoutForm"+i} onChange={e => setUpdatedWorkoutName(e.target.value)}/>
-                                </>
+                            </>
                             : <>
                             {workoutName}
                                 <Button className="ModifyWorkoutButton" variant="danger" key={"DeleteButton"+i}> Delete Workout
                                     <MDBIcon icon="trash" className="ml-2"/>
                                 </Button>
-                                <Button className="ModifyWorkoutButton" variant="primary" key={"EditButton"+i} value={i} onClick={e => editWorkout(set, measureType, e.target.value)}>
+                                <Button className="ModifyWorkoutButton" variant="primary" key={"EditButton"+i} value={i} onClick={e => editWorkout(set, measureType, workoutName, workoutMeasure[measureType], e.target.value)}>
                                     Edit Workout
                                     <MDBIcon icon="edit" className="ml-2"/>
                                 </Button>
@@ -109,9 +120,9 @@ export default function ViewNotes() {
                                                 Number of Reps
                                         </Dropdown.Item>
                                     </DropdownButton>
-                                    <Form.Control placeholder={workoutMeasurePlaceholder} defaultValue={workoutMeasure[measureType]} key="EditWorkoutMeasure"/>
+                                    <Form.Control placeholder={workoutMeasurePlaceholder} defaultValue={workoutMeasure} key={"EditWorkoutMeasure"+i} onChange={e => setUpdatedWorkoutMeasure(e.target.value)}/>
                                     <p>{units}</p>
-                                    <Button className="DoneEditButton" variant="secondary" key={"DoneButton"+i}>
+                                    <Button className="DoneEditButton" variant="secondary" key={"DoneButton"+i} value={i} onClick={e => submitEditWorkout(set, e.target.value)}>
                                         Done
                                     </Button>
                                     <Button className="CancelEditButton" variant="danger" key={"CancelButton"+i} onClick={e => setEditWorkoutField(-1)}>
@@ -122,13 +133,13 @@ export default function ViewNotes() {
                                     { (measureType == "workoutTime") &&
                                         <>
                                             <Card.Title key={"WorkoutCardTitle"+i}> Workout Time: </Card.Title>
-                                            <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure[measureType] + " seconds"} </Card.Text>
+                                            <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure + " seconds"} </Card.Text>
                                         </>
                                     }
                                     { (measureType == "workoutReps") &&
                                         <>
                                             <Card.Title key={"WorkoutCardTitle"+i}> Number of Reps: </Card.Title>
-                                            <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure[measureType] + " times"} </Card.Text>
+                                            <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure + " times"} </Card.Text>
                                         </>
                                     }
                                 </>
@@ -141,21 +152,62 @@ export default function ViewNotes() {
         return allWorkoutsArray;
     }
 
-    function editWorkout(set, type, num) {
+    // "Edit" button is clicked
+    function editWorkout(set, type, name, measure, num) {
         setEditWorkoutField(num);
-        workoutMeasureFields(type);
+        setUpdatedWorkoutName(name);
+        setUpdatedWorkoutMeasure(measure);
+        workoutMeasureFields(type);        
+    }
 
-        let request = {
-            method: "post",
-            headers: {
-              "Content-Type":"application/json"
-            },
-            body: JSON.stringify({
-              workoutSetName: set,
-              workoutNumber: num,
-              workoutName: updatedWorkoutName
-            })
-        };
+    // Rest after user finish editing
+    function doneEditing(set, num) {
+        setEditWorkoutField(-1);
+        let oldSets = [...allSets];
+        let oldWorkoutName = oldSets[num];
+
+        let updatedWorkouts = {... allData};
+        // updatedWorkouts[set].delete(oldWorkoutName);
+        updatedWorkouts[set][updatedWorkoutName] = {};
+        // updatedWorkouts[set][updatedWorkoutName] = updatedWorkoutMeasureType;
+        // updatedWorkouts[set][updatedWorkoutName][updatedWorkoutMeasureType] = updatedWorkoutMeasure;
+
+        console.log(updatedWorkouts);
+    }
+
+    // calls API when user done editing
+    function submitEditWorkout(set, num) {
+        doneEditing(set, num);
+
+        let request = {};
+        if(updatedWorkoutMeasureType == "workoutTime") {
+            request = {
+                method: "post",
+                headers: {
+                "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                workoutSetName: set,
+                workoutNumber: num,
+                workoutName: updatedWorkoutName,
+                workoutTime: updatedWorkoutMeasure
+                })
+            };
+        }
+        else if(updatedWorkoutMeasureType == "workoutReps") {
+            request = {
+                method: "post",
+                headers: {
+                "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                workoutSetName: set,
+                workoutNumber: num,
+                workoutName: updatedWorkoutName,
+                workoutReps: updatedWorkoutMeasure
+                })
+            };
+        }
       
         console.log(request);
         // fetch

@@ -14,21 +14,24 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 // Returns a json to save from the received post_workout API request
 function setWorkoutRequest(req, allSets) {
   
-  let requestSent = {}; 
+  let newWorkout = {}; 
   let workoutSetName = req.body.workoutSetName;
   let workoutName = req.body.workoutName;
-
-  // workoutTime or workoutReps
-  if (req.body.workoutReps != null) {
-  requestSent[workoutName] = { workoutReps: req.body.workoutReps }
-  }
-  else {
-    requestSent[workoutName] = { workoutTime: req.body.workoutTime }
-  }
-
-  // adding to existing set
   allSets = JSON.parse(allSets);
-  allSets.workoutSets[workoutSetName][workoutName] = requestSent[workoutName];
+
+  if (req.body.workoutReps) {
+    newWorkout = { 
+      workoutName: workoutName,
+      workoutReps: req.body.workoutReps
+    };
+  }
+  else if(req.body.workoutTime) {
+    newWorkout = { 
+      workoutName: workoutName,
+      workoutTime: req.body.workoutTime
+    };
+  }
+  allSets.workoutSets[workoutSetName].push(newWorkout);
 
   return allSets;
 }
@@ -61,7 +64,6 @@ app.get('/view_workouts', (req, res) => {
 
   let allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
   allSets = JSON.parse(allSets);
-  console.log(req.query);
   res.send(allSets.workoutSets[req.query.set]);
 })
 
@@ -82,14 +84,14 @@ app.post('/new_set', (req,res) => {
     allSets = JSON.parse(allSets);
 
     if(allSets.length == 0) {
-      const newSet = {}
-      newSet[req.body.workoutSetName] = {}
+      const newSet = {};
+      newSet[req.body.workoutSetName] = [];
       allSets = {
         workoutSets: newSet
       };
     }
     else {
-      allSets.workoutSets[req.body.workoutSetName] = {};
+      allSets.workoutSets[req.body.workoutSetName] = [];
     }
 
     fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allSets));
