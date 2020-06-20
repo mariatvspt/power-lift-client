@@ -31,3 +31,21 @@
     text-align: center;
     margin-top: 100px;
 }
+
+.WorkoutNameInModal {
+    font-size: 1.5rem;
+    font-weight: 500 !important;
+}
+
+.WorkoutTypeInModal {
+    font-size: 1.25rem;
+    font-weight: 500 !important;
+}
+
+.WorkoutMeasureInModal {
+    font-size: 1.25rem;
+}
+
+.ModifySetButton {
+    float: right;
+}

@@ -174,3 +174,28 @@ app.post('/edit_workout', (req, res) => {
         });
     }
 });
+
+app.post('/delete_workout', (req, res) => {
+  try {
+    let allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+    allData = JSON.parse(allData);
+
+    let workoutSetName = req.body.workoutSetName;
+    let workoutIndex = req.body.workoutIndex;
+
+    allData.workoutSets[workoutSetName].splice(workoutIndex, 1); // delete original workout
+
+    fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allData));
+    return res.status(200).json({
+        status: 200,
+        message: 'Sucessfully posted a workout!',
+        data:  req.body
+    })
+  }
+  catch(e){
+      res.status(400).json({
+        status: 400,
+        error: e.message
+      });
+  }
+});
