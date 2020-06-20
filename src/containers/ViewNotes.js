@@ -21,9 +21,6 @@ export default function ViewNotes() {
     const [DropDownTitle, setDropDownTitle] = useState("");
     const [workoutMeasurePlaceholder, setWorkoutMeasurePlaceholder] = useState("");
     const [showDeleteWorkoutModal, setShowDeleteWorkoutModal] = useState(false);
-    const [onMouseShowModifySetButtons, setOnMouseShowModifySetButtons] = useState(-1);
-    const [onSelectShowModifySetButtons, setOnSelectShowModifySetButtons] = useState(-1);
-    const [workoutSetIndex, setWorkoutSetIndex] = useState(-1);
     const [units, setUnits] = useState("");
 
     useEffect(() => {
@@ -62,22 +59,27 @@ export default function ViewNotes() {
         setUpdatedWorkoutMeasureType(e);
     }
 
+    // Display modify set button icons
     function displayModifySetButtons(i) {
         return (
             <>
-                {console.log(onMouseShowModifySetButtons, onSelectShowModifySetButtons)}
-                {(onMouseShowModifySetButtons == i || onSelectShowModifySetButtons == i) &&
-                    <>
-                        <Button className="ModifySetButton" variant="outline-dark" key={"DeleteSetButton"+i} value={i}>
-                            <MDBIcon icon="trash"/>
-                        </Button>
-                        <Button className="ModifySetButton" variant="outline-dark" key={"EditSetButton"+i} value={i}>
-                            <MDBIcon icon="edit"/>
-                        </Button>
-                    </>
-                }  
+                <Button className="ModifySetButton" variant="outline-dark" key={"DeleteSetButton"+i} value={i}>
+                    <MDBIcon icon="trash"/>
+                </Button>
+                <Button className="ModifySetButton" variant="outline-dark" key={"EditSetButton"+i} value={i}>
+                    <MDBIcon icon="edit"/>
+                </Button>
             </>
         );
+    }
+
+    // When user select a workout set tab
+    function onSelectWorkoutSetTab(e) {
+        const elements = document.getElementsByClassName("SetTab");
+        for (let element of elements) {
+            element.className = element.className.split(' ').filter(word => word !== "SelectedTab").join(' ');
+        }
+        document.getElementById(e).className += " SelectedTab";
     }
 
     // Display all sets as NavItem
@@ -87,10 +89,8 @@ export default function ViewNotes() {
         for(var i = 0; i < allSets.length; i++) {
             allSetsArray.push(
                 <NavItem key={"set"+i}>
-                    <NavLink
-                    onMouseEnter={e => setOnMouseShowModifySetButtons(e.target.id)}
-                    onMouseLeave={e => setOnMouseShowModifySetButtons(-1)}
-                    onSelect={e => setKey(allSets[e]) & setOnSelectShowModifySetButtons(e)}
+                    <NavLink className="SetTab"
+                    onSelect={e => setKey(allSets[e]) & onSelectWorkoutSetTab(e)}
                     key={"set"+i}
                     id={i}
                     eventKey={i}>
@@ -160,7 +160,7 @@ export default function ViewNotes() {
                             { (measureType == "workoutReps") &&
                                 <>
                                     <Card.Title key={"WorkoutCardTitle"+i}> Number of Reps: </Card.Title>
-                                    <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure + " times"} </Card.Text>
+                                    <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure + " reps"} </Card.Text>
                                 </>
                             }
                         </>
@@ -294,7 +294,7 @@ export default function ViewNotes() {
 
         updatedWorkouts[set].splice(index, 1); // delete original workout
         updatedWorkouts[set].splice(index, 0, updatedWorkout); // insert new workout
-
+        
         setShowEditWorkoutFields(-1);
         setAllData(updatedWorkouts);
     }
