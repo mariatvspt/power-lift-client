@@ -10,6 +10,8 @@ export default function ViewNotes() {
     const [allData, setAllData] = useState({});
     const [key, setKey] = useState("");
     const [showEditWorkoutFields, setShowEditWorkoutFields] = useState(-1);
+    const [showEditSetFields, setShowEditSetFields] = useState(-1);
+    const [updatedWorkoutSetName, setUpdatedWorkoutSetName] = useState("");
     const [updatedWorkoutName, setUpdatedWorkoutName] = useState("");
     const [updatedWorkoutMeasure, setUpdatedWorkoutMeasure] = useState(0);
     const [updatedWorkoutMeasureType, setUpdatedWorkoutMeasureType] = useState("");
@@ -60,16 +62,35 @@ export default function ViewNotes() {
     }
 
     // Display modify set button icons
-    function displayModifySetButtons(i) {
+    function displayModifySetButtons(workoutSetName, i) {
         return (
-            <>
-                <Button className="ModifySetButton" variant="outline-dark" key={"DeleteSetButton"+i} value={i}>
-                    <MDBIcon icon="trash"/>
-                </Button>
-                <Button className="ModifySetButton" variant="outline-dark" key={"EditSetButton"+i} value={i}>
-                    <MDBIcon icon="edit"/>
-                </Button>
-            </>
+            <> {   showEditSetFields == i
+                ? <Form className="form-inline EditSetForm">
+                    <Form.Control className="EditSetFormControl" placeholder="Edit Set Name" defaultValue={workoutSetName} key={"EditSetForm"+i} onChange={e => setUpdatedWorkoutSetName(e.target.value)}/>
+                    <Button className="EditSetButtons" variant="info" key={"ConfirmEditSetButton"+i} value={i} id={i} onClick={e => confirmEditWorkoutSet(workoutSetName, i) & console.log("i: "+i)}>
+                        <MDBIcon icon="check"/>
+                    </Button>
+                    <Button className="EditSetButtons" variant="danger" key={"CancelEditSetButton"+i} onClick={e => setShowEditSetFields(-1)}>
+                        <MDBIcon icon="times"/>
+                    </Button>
+                </Form>
+                :<>
+                    <NavLink
+                    className="SetTab"
+                    onSelect={e => setKey(allSets[e]) & onSelectWorkoutSetTab(e)}
+                    key={"set"+i}
+                    id={i}
+                    eventKey={i}>
+                        {allSets[i]}   
+                        <Button className="ModifySetButton" variant="outline-dark" key={"DeleteSetButton"+i}>
+                            <MDBIcon icon="trash"/>
+                        </Button>
+                        <Button className="ModifySetButton" variant="outline-dark" key={"EditSetButton"+i} onClick={e => onClickEditSetButton(workoutSetName, i)}>
+                            <MDBIcon icon="edit"/>
+                        </Button>
+                    </NavLink>
+                </>   
+            } </> 
         );
     }
 
@@ -89,14 +110,7 @@ export default function ViewNotes() {
         for(var i = 0; i < allSets.length; i++) {
             allSetsArray.push(
                 <NavItem key={"set"+i}>
-                    <NavLink className="SetTab"
-                    onSelect={e => setKey(allSets[e]) & onSelectWorkoutSetTab(e)}
-                    key={"set"+i}
-                    id={i}
-                    eventKey={i}>
-                        {allSets[i]}   
-                        {displayModifySetButtons(i)}   
-                    </NavLink>
+                    {displayModifySetButtons(allSets[i], i)}
                 </NavItem>
             );
         }
@@ -108,11 +122,10 @@ export default function ViewNotes() {
     function displayWorkoutName(set, workoutName, measureType, workoutMeasure, i) {
         return <Card.Header className="WorkoutHeader" key={"CardHeaderKey"+i}>
             { showEditWorkoutFields == i
-                ? <>
+                ?
                     <Form.Control placeholder="Edit Workout Name" defaultValue={workoutName} key={"EditWorkoutForm"+i} onChange={e => setUpdatedWorkoutName(e.target.value)}/>
-                </>
                 : <>
-                {workoutName}
+                    {workoutName}
                     <Button className="ModifyWorkoutButton" variant="danger" key={"DeleteWorkoutButton"+i} value={i} onClick={e => onClickDeleteWorkoutButton(set, workoutName, measureType, workoutMeasure, i)}> Delete Workout
                         <MDBIcon icon="trash" className="ml-2"/>
                     </Button>
@@ -143,10 +156,10 @@ export default function ViewNotes() {
                             </DropdownButton>
                             <Form.Control placeholder={workoutMeasurePlaceholder} defaultValue={workoutMeasure} key={"EditWorkoutMeasure"+i} onChange={e => setUpdatedWorkoutMeasure(e.target.value)}/>
                             <p>{units}</p>
-                            <Button className="DoneEditButton" variant="secondary" key={"DoneButton"+i} value={i} onClick={e => submitEditWorkout(set, e.target.value)}>
+                            <Button className="DoneEditWorkoutButton" variant="secondary" key={"DoneWorkoutButton"+i} value={i} onClick={e => confirmEditWorkout(set, e.target.value)}>
                                 Done
                             </Button>
-                            <Button className="CancelEditButton" variant="danger" key={"CancelButton"+i} onClick={e => setShowEditWorkoutFields(-1)}>
+                            <Button className="CancelEditWorkoutButton" variant="danger" key={"CancelWorkoutButton"+i} onClick={e => setShowEditWorkoutFields(-1)}>
                                 Cancel
                             </Button>
                         </>
@@ -177,7 +190,7 @@ export default function ViewNotes() {
         if(workouts.length == 0) {
             return <p className="NoWorkoutToDisplayText"> No workouts have been added to this set. </p>
         }
-        
+
         for(var i=0; i < workouts.length; i++) {
             const workoutName = workouts[i].workoutName;
             let measureType = "";
@@ -203,6 +216,7 @@ export default function ViewNotes() {
         return allWorkoutsArray;
     }
 
+    // Display modal to confirm the deletion of a specific workout
     function displayDeleteWorkoutModal() {
         return (
             <Modal show={showDeleteWorkoutModal} onHide={e => setShowDeleteWorkoutModal(false)} style={{opacity:1}}>
@@ -232,7 +246,56 @@ export default function ViewNotes() {
         );
     }
 
+    // Edit set icon is clicked
+    function onClickEditSetButton(setName, i) {
+        setShowEditSetFields(i);
+        setUpdatedWorkoutSetName(setName);
+    }
 
+    const renameProp = (
+        oldProp,
+        newProp,
+      { [oldProp]: old, ...others }
+      ) => ({
+        [newProp]: old,
+        ...others
+    });
+
+    // Rerender page after finish editing set name
+    function rerenderAfterEditingSetName(workoutSetName, i) {
+        let updatedSets = [...allSets];
+        updatedSets[i] = updatedWorkoutSetName;
+        setAllSets(updatedSets);
+
+        let updatedData = {...allData};
+        updatedData = renameProp(workoutSetName, updatedWorkoutSetName, updatedData);
+        // let tempWorkouts = updatedData[workoutSetName];
+        // delete updatedData[workoutSetName];
+        // updatedData[updatedWorkoutSetName] = tempWorkouts;
+        setAllData(updatedData);
+        setKey(updatedWorkoutSetName); // remove i think
+    }
+
+    // When clicks the "check" icon to submit set name edit
+    function confirmEditWorkoutSet(workoutSetName, i) {
+        setShowEditSetFields(-1);
+        rerenderAfterEditingSetName(workoutSetName, i);
+        
+        let request = {
+            method: "post",
+            headers: {
+            "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+            originalWorkoutSetName: workoutSetName,
+            updatedWorkoutSetName: updatedWorkoutSetName
+            })
+        };
+
+        fetch('/edit_set', request).then(response => console.log(response));
+    }
+
+    // "Delete workout" button is clicked
     function onClickDeleteWorkoutButton(setName, workoutName, workoutMeasureType, workoutMeasure, index) {
         setShowDeleteWorkoutModal(true);
         setDeletedWorkoutName(workoutName);
@@ -242,7 +305,7 @@ export default function ViewNotes() {
         setDeletedWorkoutIndex(index);
     }
 
-    // Rerender page after finish deleting
+    // Rerender page after finish deleting workout
     function rerenderAfterDeletingWorkout(set, index) {
         let updatedWorkouts = {...allData};
         updatedWorkouts[set].splice(index, 1);
@@ -276,7 +339,7 @@ export default function ViewNotes() {
         workoutMeasureFields(type); 
     }
 
-    // Rerender page after finish editing
+    // Rerender page after finish editing workout
     function rerenderAfterEditingWorkout(set, index) {
         let updatedWorkouts = {...allData};
         let updatedWorkout = {};
@@ -300,7 +363,7 @@ export default function ViewNotes() {
     }
 
     // Calls edit_workout API when user done editing
-    function submitEditWorkout(set, index) {
+    function confirmEditWorkout(set, index) {
         rerenderAfterEditingWorkout(set, index);
         
         let request = {};
@@ -333,14 +396,13 @@ export default function ViewNotes() {
             };
         }
       
-        console.log(request);
         fetch('/edit_workout', request).then(response => console.log(response));
     }
 
   return (
     <div className="ViewNotes">
         {displayDeleteWorkoutModal()}
-        <form>
+        {/* <form> */}
             <TabContainer activeKey={key}>
                 <Row>
                     <Col sm={3}>
@@ -357,7 +419,7 @@ export default function ViewNotes() {
                     </Col>
                 </Row>
             </TabContainer>
-        </form>
+        {/* </form> */}
     </div>
   );
 }

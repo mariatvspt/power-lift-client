@@ -112,6 +112,43 @@ app.post('/new_set', (req,res) => {
   }
 });
 
+renameProp = (
+    oldProp,
+    newProp,
+  { [oldProp]: old, ...others }
+  ) => ({
+    [newProp]: old,
+    ...others
+});
+
+// Edit an existing set
+app.post('/edit_set', (req,res) => {
+  try {
+    let allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+    allSets = JSON.parse(allSets);
+    const originalWorkoutSetName = req.body.originalWorkoutSetName;
+    const updatedWorkoutSetName = req.body.updatedWorkoutSetName;
+
+    allSets.workoutSets = renameProp(originalWorkoutSetName, updatedWorkoutSetName, allSets.workoutSets);
+    console.log(allSets);
+
+
+    fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allSets));
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Sucessfully created a new workout set!',
+      data:  req.body
+    })
+  }
+  catch(e){
+    res.status(400).json({
+      status: 400,
+      error: e.message
+    });
+  }
+});
+
 // Post a workout with time or rep in a given set
 app.post('/new_workout', (req, res) => {
     try {

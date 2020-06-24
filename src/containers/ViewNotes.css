@@ -12,12 +12,12 @@
     margin-bottom: 15px;
 }
 
-.CancelEditButton {
+.CancelEditWorkoutButton {
     margin-right: 5px;
     float: right;
 }
 
-.DoneEditButton {
+.DoneEditWorkoutButton {
     float: right;
 }
 
@@ -77,8 +77,21 @@
     border-radius: .25rem;
     outline: 5px auto -webkit-focus-ring-color;
     outline-offset: -2px;
-    /* background-color: #f8f9fa; */
-    background-color: #ded5eb;
+    background-color: #f8f9fa;
     color:black;
     font-weight: 500;
+}
+
+.EditSetFormControl {
+    height: 100%;
+    width: 75% !important;
+}
+
+.EditSetButtons {
+    float: right;
+}
+
+.EditSetForm {
+    background-color: #f8f9fa;
+    padding: 2%;
 }
