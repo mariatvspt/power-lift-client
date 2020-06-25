@@ -384,7 +384,9 @@ export default function ViewNotes() {
     // When clicks the "check" icon to submit set name edit
     function confirmEditWorkoutSet(workoutSetName, i) {
         setShowEditSetFields(-1);
-        rerenderAfterEditingSetName(workoutSetName, i);
+        if(workoutSetName != updatedWorkoutSetName) {
+            rerenderAfterEditingSetName(workoutSetName, i);
+        }
         
         let request = {
             method: "post",
