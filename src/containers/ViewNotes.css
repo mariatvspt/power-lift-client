@@ -37,12 +37,21 @@
     font-weight: 500 !important;
 }
 
+.SetNameInModal {
+    font-size: 1.5rem;
+    font-weight: 500 !important;
+}
+
 .WorkoutTypeInModal {
     font-size: 1.25rem;
     font-weight: 500 !important;
 }
 
 .WorkoutMeasureInModal {
+    font-size: 1.25rem;
+}
+
+.SetLengthInModal {
     font-size: 1.25rem;
 }
 
@@ -83,7 +92,7 @@
 }
 
 .EditSetFormControl {
-    height: 100%;
+    height: 100% !important;
     width: 75% !important;
 }
 
@@ -93,5 +102,4 @@
 
 .EditSetForm {
     background-color: #f8f9fa;
-    padding: 2%;
 }

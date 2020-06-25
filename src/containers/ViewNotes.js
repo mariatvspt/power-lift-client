@@ -17,6 +17,8 @@ export default function ViewNotes() {
     const [updatedWorkoutName, setUpdatedWorkoutName] = useState("");
     const [updatedWorkoutMeasure, setUpdatedWorkoutMeasure] = useState(0);
     const [updatedWorkoutMeasureType, setUpdatedWorkoutMeasureType] = useState("");
+    const [deletedSet, setDeletedSet] = useState("");
+    const [deletedSetLength, setDeletedSetLength] = useState(-1);
     const [deletedWorkoutSetName, setDeletedWorkoutSetName] = useState("");
     const [deletedWorkoutName, setDeletedWorkoutName] = useState("");
     const [deletedWorkoutMeasureType, setDeletedWorkoutMeasureType] = useState("");
@@ -25,6 +27,7 @@ export default function ViewNotes() {
     const [DropDownTitle, setDropDownTitle] = useState("");
     const [workoutMeasurePlaceholder, setWorkoutMeasurePlaceholder] = useState("");
     const [showDeleteWorkoutModal, setShowDeleteWorkoutModal] = useState(false);
+    const [showDeleteSetModal, setShowDeleteSetModal] = useState(false);
     const [units, setUnits] = useState("");
     const emptySetNameOverlayTarget = useRef(null);
 
@@ -116,7 +119,7 @@ export default function ViewNotes() {
                     id={i}
                     eventKey={i}>
                         {allSets[i]}   
-                        <Button className="ModifySetButton" variant="outline-dark" key={"DeleteSetButton"+i}>
+                        <Button className="ModifySetButton" variant="outline-dark" key={"DeleteSetButton"+i} onClick={e => onClickDeleteSetButton(workoutSetName)}>
                             <MDBIcon icon="trash"/>
                         </Button>
                         <Button className="ModifySetButton" variant="outline-dark" key={"EditSetButton"+i} onClick={e => onClickEditSetButton(workoutSetName, i)}>
@@ -307,6 +310,55 @@ export default function ViewNotes() {
         );
     }
 
+    function displayDeleteSetModal() {
+        return (
+            <Modal show={showDeleteSetModal} onHide={e => setShowDeleteSetModal(false)} style={{opacity:1}}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Are you sure you want to delete this set? </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p className="SetNameInModal">{deletedSet}</p>
+                    <p className="SetLengthInModal"> Total workouts: {deletedSetLength}</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={e => setShowDeleteSetModal(false)} variant="secondary">Cancel</Button>
+                    <Button onClick={e => confirmDeleteWorkoutSet()} variant="danger">Delete</Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+
+    // When user clicked
+    function onClickDeleteSetButton(setName) {
+        setShowDeleteSetModal(true);
+        setDeletedSet(setName);
+        setDeletedSetLength(allData[setName].length);
+    }
+
+    function rerenderAfterDeletingSetName() {
+        let updatedData = {...allData}
+        delete updatedData[deletedSet];
+        setAllData(updatedData);
+        setAllSets(Object.keys(updatedData));
+    }
+
+    function confirmDeleteWorkoutSet() {
+        setShowDeleteSetModal(false);
+        rerenderAfterDeletingSetName();
+
+        let request = {
+            method: "post",
+            headers: {
+            "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+            deletedWorkoutSetName: deletedSet
+            })
+        };
+
+        fetch('/delete_set', request).then(response => console.log(response));
+    }
+
     // Edit set icon is clicked
     function onClickEditSetButton(setName, i) {
         setShowEditSetFields(i);
@@ -455,24 +507,23 @@ export default function ViewNotes() {
   return (
     <div className="ViewNotes">
         {displayDeleteWorkoutModal()}
-        {/* <form> */}
-            <TabContainer activeKey={key}>
-                <Row>
-                    <Col sm={3}>
-                        <Nav className="Nav" variant="pills" className="flex-column">
-                            {displayAllSets()}
-                            <Dropdown.Divider />
-                            <NavLink onSelect={e => setKey(e)} eventKey="AllWorkouts">View All</NavLink>
-                        </Nav>
-                    </Col>
-                    <Col sm={9}>
-                        <TabContent>
-                            {includes(key, allSets) && viewWorkouts(key)}
-                        </TabContent>
-                    </Col>
-                </Row>
-            </TabContainer>
-        {/* </form> */}
+        {displayDeleteSetModal()}
+        <TabContainer activeKey={key}>
+            <Row>
+                <Col sm={3}>
+                    <Nav className="Nav" variant="pills" className="flex-column">
+                        {displayAllSets()}
+                        <Dropdown.Divider />
+                        <NavLink onSelect={e => setKey(e)} eventKey="AllWorkouts">View All</NavLink>
+                    </Nav>
+                </Col>
+                <Col sm={9}>
+                    <TabContent>
+                        {includes(key, allSets) && viewWorkouts(key)}
+                    </TabContent>
+                </Col>
+            </Row>
+        </TabContainer>
     </div>
   );
 }

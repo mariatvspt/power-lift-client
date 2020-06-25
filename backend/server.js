@@ -154,6 +154,31 @@ app.post('/edit_set', (req,res) => {
   }
 });
 
+// Edit an existing set
+app.post('/delete_set', (req,res) => {
+  try {
+    let allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+    allData = JSON.parse(allData);
+    const deletedWorkoutSetName = req.body.deletedWorkoutSetName;
+
+    delete allData.workoutSets[deletedWorkoutSetName];
+
+    fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allData));
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Sucessfully created a new workout set!',
+      data:  req.body
+    })
+  }
+  catch(e){
+    res.status(400).json({
+      status: 400,
+      error: e.message
+    });
+  }
+});
+
 // Post a workout with time or rep in a given set
 app.post('/new_workout', (req, res) => {
     try {
