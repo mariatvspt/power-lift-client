@@ -112,28 +112,33 @@ app.post('/new_set', (req,res) => {
   }
 });
 
-renameProp = (
-    oldProp,
-    newProp,
-  { [oldProp]: old, ...others }
-  ) => ({
-    [newProp]: old,
-    ...others
-});
+function renameKey(data, oldKey, newKey) {
+  let newMap = {};
+
+  for (key in data) {
+    if(key == oldKey) {
+      newMap[newKey] = data[oldKey];
+    }
+    else {
+      newMap[key] = data[key];
+    }
+  }
+
+  return newMap;
+}
 
 // Edit an existing set
 app.post('/edit_set', (req,res) => {
   try {
-    let allSets = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
-    allSets = JSON.parse(allSets);
+    let allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+    allData = JSON.parse(allData);
     const originalWorkoutSetName = req.body.originalWorkoutSetName;
     const updatedWorkoutSetName = req.body.updatedWorkoutSetName;
 
-    allSets.workoutSets = renameProp(originalWorkoutSetName, updatedWorkoutSetName, allSets.workoutSets);
-    console.log(allSets);
+    allSets = renameKey(allData.workoutSets, originalWorkoutSetName, updatedWorkoutSetName);
+    allData.workoutSets = allSets;
 
-
-    fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allSets));
+    fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allData));
 
     return res.status(200).json({
       status: 200,

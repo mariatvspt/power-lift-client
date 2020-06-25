@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { OverlayTrigger, Modal, DropdownButton, Form, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem, NavLink } from "react-bootstrap";
+import { Overlay, Tooltip, Modal, DropdownButton, Form, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem, NavLink } from "react-bootstrap";
 import { MDBBtn, MDBIcon } from 'mdbreact';
 import LoaderButton from "../components/LoaderButton";
 import { selectInput } from "aws-amplify";
@@ -9,6 +9,8 @@ export default function ViewNotes() {
     const [allSets, setAllSets] = useState([]);
     const [allData, setAllData] = useState({});
     const [key, setKey] = useState("");
+    const [emptySetNameError, setEmptySetNameError] = useState(false);
+    const [duplicateSetNameError, setDuplicateSetNameError] = useState(false);
     const [showEditWorkoutFields, setShowEditWorkoutFields] = useState(-1);
     const [showEditSetFields, setShowEditSetFields] = useState(-1);
     const [updatedWorkoutSetName, setUpdatedWorkoutSetName] = useState("");
@@ -24,6 +26,7 @@ export default function ViewNotes() {
     const [workoutMeasurePlaceholder, setWorkoutMeasurePlaceholder] = useState("");
     const [showDeleteWorkoutModal, setShowDeleteWorkoutModal] = useState(false);
     const [units, setUnits] = useState("");
+    const emptySetNameOverlayTarget = useRef(null);
 
     useEffect(() => {
         // Fetch all sets with view_all API
@@ -40,6 +43,17 @@ export default function ViewNotes() {
     function includes(target, array) {
         for(var i=0; i<array.length; i++) {
             if(array[i] == target) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // check there is a duplicate in an array at a given index
+    function checkDuplicates(target, array, index) {
+        for(var i=0; i<array.length; i++) {
+            console.log(array[i], target);
+            if(i != index && array[i] == target) {
                 return true;
             }
         }
@@ -66,10 +80,30 @@ export default function ViewNotes() {
         return (
             <> {   showEditSetFields == i
                 ? <Form className="form-inline EditSetForm">
-                    <Form.Control className="EditSetFormControl" placeholder="Edit Set Name" defaultValue={workoutSetName} key={"EditSetForm"+i} onChange={e => setUpdatedWorkoutSetName(e.target.value)}/>
-                    <Button className="EditSetButtons" variant="info" key={"ConfirmEditSetButton"+i} value={i} id={i} onClick={e => confirmEditWorkoutSet(workoutSetName, i) & console.log("i: "+i)}>
+                    <Form.Control ref={emptySetNameOverlayTarget} className="EditSetFormControl" placeholder="Edit Set Name" defaultValue={workoutSetName} key={"EditSetForm"+i} onChange={e => onChangeEditWorkoutSetName(e, i)}/>
+                    <Overlay target={emptySetNameOverlayTarget.current} show={emptySetNameError} placement="left">
+                        {(props) => (
+                        <Tooltip id="overlay-example" {...props}>
+                            Please enter a non-empty set name.
+                        </Tooltip>
+                        )}
+                    </Overlay>
+                    <Overlay target={emptySetNameOverlayTarget.current} show={duplicateSetNameError} placement="left">
+                        {(props) => (
+                        <Tooltip id="overlay-example" {...props}>
+                            Please enter a non-existing set name.
+                        </Tooltip>
+                        )}
+                    </Overlay>
+                    {
+                        emptySetNameError || duplicateSetNameError
+                        ? <Button disabled className="EditSetButtons" variant="secondary" key={"ConfirmEditSetButton"+i} value={i} id={i} onClick={e => confirmEditWorkoutSet(workoutSetName, i)}>
                         <MDBIcon icon="check"/>
                     </Button>
+                        : <Button className="EditSetButtons" variant="info" key={"ConfirmEditSetButton"+i} value={i} id={i} onClick={e => confirmEditWorkoutSet(workoutSetName, i)}>
+                            <MDBIcon icon="check"/>
+                        </Button>
+                    }
                     <Button className="EditSetButtons" variant="danger" key={"CancelEditSetButton"+i} onClick={e => setShowEditSetFields(-1)}>
                         <MDBIcon icon="times"/>
                     </Button>
@@ -94,13 +128,40 @@ export default function ViewNotes() {
         );
     }
 
+    // When user is editing the workout set name
+    function onChangeEditWorkoutSetName(e, index) {
+        setUpdatedWorkoutSetName(e.target.value);
+
+        // cannot change to an empty set name
+        if(e.target.value == "") {
+            setEmptySetNameError(true);
+        }
+        else {
+            setEmptySetNameError(false);
+        }
+
+        // cannot change to an existing set name
+        if(checkDuplicates(e.target.value, allSets, index)) {
+            setDuplicateSetNameError(true);
+        }
+        else {
+            setDuplicateSetNameError(false);
+        }
+    }
+
     // When user select a workout set tab
     function onSelectWorkoutSetTab(e) {
+        // reset classname for enabling/disabling hover for the icons
         const elements = document.getElementsByClassName("SetTab");
         for (let element of elements) {
             element.className = element.className.split(' ').filter(word => word !== "SelectedTab").join(' ');
         }
         document.getElementById(e).className += " SelectedTab";
+
+        // if user select another set while editing another set, the edit is cancelled
+        if(showEditSetFields!= -1 && e!=showEditSetFields) {
+            setShowEditSetFields(-1);
+        }
     }
 
     // Display all sets as NavItem
@@ -252,26 +313,18 @@ export default function ViewNotes() {
         setUpdatedWorkoutSetName(setName);
     }
 
-    const renameProp = (
-        oldProp,
-        newProp,
-      { [oldProp]: old, ...others }
-      ) => ({
-        [newProp]: old,
-        ...others
-    });
-
+    
     // Rerender page after finish editing set name
     function rerenderAfterEditingSetName(workoutSetName, i) {
         let updatedSets = [...allSets];
         updatedSets[i] = updatedWorkoutSetName;
         setAllSets(updatedSets);
 
+        // rename key
         let updatedData = {...allData};
-        updatedData = renameProp(workoutSetName, updatedWorkoutSetName, updatedData);
-        // let tempWorkouts = updatedData[workoutSetName];
-        // delete updatedData[workoutSetName];
-        // updatedData[updatedWorkoutSetName] = tempWorkouts;
+        updatedData[updatedWorkoutSetName] = updatedData[workoutSetName];
+        delete updatedData[workoutSetName];
+        console.log(updatedData);
         setAllData(updatedData);
         setKey(updatedWorkoutSetName); // remove i think
     }
