@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Overlay, Tooltip, Modal, DropdownButton, Form, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem, NavLink } from "react-bootstrap";
 import { MDBBtn, MDBIcon } from 'mdbreact';
-import LoaderButton from "../components/LoaderButton";
-import { selectInput } from "aws-amplify";
+import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
+import { confirmEditWorkout, confirmDeleteWorkout, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, workoutMeasureFields } from "../controllers/DisplayWorkoutsController.js"
 import "./ViewNotes.css"
 
 export default function ViewNotes() {
@@ -42,130 +42,57 @@ export default function ViewNotes() {
         fetchSets();
     }, []);
 
-    // Check if target element is in an array
-    function includes(target, array) {
-        for(var i=0; i<array.length; i++) {
-            if(array[i] == target) {
-                return true;
-            }
-        }
-        return false;
-    }
+    /*** DISPLAY MODALS ***/
 
-    // check there is a duplicate in an array at a given index
-    function checkDuplicates(target, array, index) {
-        for(var i=0; i<array.length; i++) {
-            console.log(array[i], target);
-            if(i != index && array[i] == target) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Set state of the workout measure fields
-    function workoutMeasureFields(e) {
-        if(e == "workoutTime") {
-            setDropDownTitle("Workout Time");
-            setWorkoutMeasurePlaceholder("Edit workout time");
-            setUnits("seconds");
-        }
-        else if(e == "workoutReps") {
-            setDropDownTitle("Number of Reps");
-            setWorkoutMeasurePlaceholder("Edit number of reps");
-            setUnits("reps")
-        }
-        setUpdatedWorkoutMeasureType(e);
-    }
-
-    // Display modify set button icons
-    function displayModifySetButtons(workoutSetName, i) {
+    function displayDeleteSetModal() {
         return (
-            <> {   showEditSetFields == i
-                ? <Form className="form-inline EditSetForm">
-                    <Form.Control ref={emptySetNameOverlayTarget} className="EditSetFormControl" placeholder="Edit Set Name" defaultValue={workoutSetName} key={"EditSetForm"+i} onChange={e => onChangeEditWorkoutSetName(e, i)}/>
-                    <Overlay target={emptySetNameOverlayTarget.current} show={emptySetNameError} placement="left">
-                        {(props) => (
-                        <Tooltip id="overlay-example" {...props}>
-                            Please enter a non-empty set name.
-                        </Tooltip>
-                        )}
-                    </Overlay>
-                    <Overlay target={emptySetNameOverlayTarget.current} show={duplicateSetNameError} placement="left">
-                        {(props) => (
-                        <Tooltip id="overlay-example" {...props}>
-                            Please enter a non-existing set name.
-                        </Tooltip>
-                        )}
-                    </Overlay>
-                    {
-                        emptySetNameError || duplicateSetNameError
-                        ? <Button disabled className="EditSetButtons" variant="secondary" key={"ConfirmEditSetButton"+i} value={i} id={i} onClick={e => confirmEditWorkoutSet(workoutSetName, i)}>
-                        <MDBIcon icon="check"/>
-                    </Button>
-                        : <Button className="EditSetButtons" variant="info" key={"ConfirmEditSetButton"+i} value={i} id={i} onClick={e => confirmEditWorkoutSet(workoutSetName, i)}>
-                            <MDBIcon icon="check"/>
-                        </Button>
-                    }
-                    <Button className="EditSetButtons" variant="danger" key={"CancelEditSetButton"+i} onClick={e => setShowEditSetFields(-1)}>
-                        <MDBIcon icon="times"/>
-                    </Button>
-                </Form>
-                :<>
-                    <NavLink
-                    className="SetTab"
-                    onSelect={e => setKey(allSets[e]) & onSelectWorkoutSetTab(e)}
-                    key={"set"+i}
-                    id={i}
-                    eventKey={i}>
-                        {allSets[i]}   
-                        <Button className="ModifySetButton" variant="outline-dark" key={"DeleteSetButton"+i} onClick={e => onClickDeleteSetButton(workoutSetName)}>
-                            <MDBIcon icon="trash"/>
-                        </Button>
-                        <Button className="ModifySetButton" variant="outline-dark" key={"EditSetButton"+i} onClick={e => onClickEditSetButton(workoutSetName, i)}>
-                            <MDBIcon icon="edit"/>
-                        </Button>
-                    </NavLink>
-                </>   
-            } </> 
+            <Modal show={showDeleteSetModal} onHide={e => setShowDeleteSetModal(false)} style={{opacity:1}}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Are you sure you want to delete this set? </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p className="SetNameInModal">{deletedSet}</p>
+                    <p className="SetLengthInModal"> Total workouts: {deletedSetLength}</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={e => setShowDeleteSetModal(false)} variant="secondary">Cancel</Button>
+                    <Button onClick={e => confirmDeleteWorkoutSet(allData, deletedSet, setShowDeleteSetModal, setAllData, setAllSets)} variant="danger">Delete</Button>
+                </Modal.Footer>
+            </Modal>
         );
     }
 
-    // When user is editing the workout set name
-    function onChangeEditWorkoutSetName(e, index) {
-        setUpdatedWorkoutSetName(e.target.value);
-
-        // cannot change to an empty set name
-        if(e.target.value == "") {
-            setEmptySetNameError(true);
-        }
-        else {
-            setEmptySetNameError(false);
-        }
-
-        // cannot change to an existing set name
-        if(checkDuplicates(e.target.value, allSets, index)) {
-            setDuplicateSetNameError(true);
-        }
-        else {
-            setDuplicateSetNameError(false);
-        }
+     // Display modal to confirm the deletion of a specific workout
+     function displayDeleteWorkoutModal() {
+        return (
+            <Modal show={showDeleteWorkoutModal} onHide={e => setShowDeleteWorkoutModal(false)} style={{opacity:1}}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Are you sure you want to delete this workout? </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p className="WorkoutNameInModal">{deletedWorkoutName}</p>
+                    {deletedWorkoutMeasureType == "workoutReps" && 
+                        <>
+                            <p className="WorkoutTypeInModal">Number of Reps:</p>
+                            <p className="WorkoutMeasureInModal">{deletedWorkoutMeasure} reps</p>
+                        </>
+                    }
+                    {deletedWorkoutMeasureType == "workoutTime" &&
+                        <>
+                            <p className="WorkoutTypeInModal">Workout Time:</p>
+                            <p className="WorkoutMeasureInModal">{deletedWorkoutMeasure} seconds</p>
+                        </>
+                    }
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={e => setShowDeleteWorkoutModal(false)} variant="secondary">Cancel</Button>
+                    <Button onClick={e => confirmDeleteWorkout(allData, deletedWorkoutSetName, deletedWorkoutIndex, setShowDeleteWorkoutModal, setAllData)} variant="danger">Delete</Button>
+                </Modal.Footer>
+            </Modal>
+        );
     }
 
-    // When user select a workout set tab
-    function onSelectWorkoutSetTab(e) {
-        // reset classname for enabling/disabling hover for the icons
-        const elements = document.getElementsByClassName("SetTab");
-        for (let element of elements) {
-            element.className = element.className.split(' ').filter(word => word !== "SelectedTab").join(' ');
-        }
-        document.getElementById(e).className += " SelectedTab";
-
-        // if user select another set while editing another set, the edit is cancelled
-        if(showEditSetFields!= -1 && e!=showEditSetFields) {
-            setShowEditSetFields(-1);
-        }
-    }
+    /*** DISPLAY SETS ***/
 
     // Display all sets as NavItem
     function displayAllSets() {
@@ -174,7 +101,14 @@ export default function ViewNotes() {
         for(var i = 0; i < allSets.length; i++) {
             allSetsArray.push(
                 <NavItem key={"set"+i}>
-                    {displayModifySetButtons(allSets[i], i)}
+                    {   showEditSetFields == i
+                        ? <>
+                            {displayEditSetFields(allSets[i], i)}
+                        </>
+                        :<>
+                            {displayEachSet(allSets[i], i)}
+                        </>   
+                    }
                 </NavItem>
             );
         }
@@ -182,72 +116,72 @@ export default function ViewNotes() {
         return allSetsArray;
     }
 
-    // Display workout name as a card header
-    function displayWorkoutName(set, workoutName, measureType, workoutMeasure, i) {
-        return <Card.Header className="WorkoutHeader" key={"CardHeaderKey"+i}>
-            { showEditWorkoutFields == i
-                ?
-                    <Form.Control placeholder="Edit Workout Name" defaultValue={workoutName} key={"EditWorkoutForm"+i} onChange={e => setUpdatedWorkoutName(e.target.value)}/>
-                : <>
-                    {workoutName}
-                    <Button className="ModifyWorkoutButton" variant="danger" key={"DeleteWorkoutButton"+i} value={i} onClick={e => onClickDeleteWorkoutButton(set, workoutName, measureType, workoutMeasure, i)}> Delete Workout
-                        <MDBIcon icon="trash" className="ml-2"/>
-                    </Button>
-                    <Button className="ModifyWorkoutButton" variant="primary" key={"EditWorkoutButton"+i} value={i} onClick={e => onClickEditWorkoutButton(set, measureType, workoutName, workoutMeasure, i)}>
-                        Edit Workout
-                        <MDBIcon icon="edit" className="ml-2"/>
-                    </Button>
-                </>
-            }
-        </Card.Header>;
-    }
-
-    // Display workout measure as a card body
-    function displayWorkoutMeasure(set, measureType, workoutMeasure, i) {
+    function displayEditSetFields(workoutSetName, i) {
         return (
-            <Card.Body key={"CardBodyKey"+i}>
-                { showEditWorkoutFields == i
-                        ? <>
-                            <DropdownButton size="lg" variant="outline-dark" onSelect={e => workoutMeasureFields(e)} title={DropDownTitle} key={"WorkoutMeasureTypeDropdown"+i}>
-                                <Dropdown.Item
-                                    eventKey="workoutTime">
-                                        Workout Time
-                                </Dropdown.Item>
-                                <Dropdown.Item
-                                    eventKey="workoutReps">
-                                        Number of Reps
-                                </Dropdown.Item>
-                            </DropdownButton>
-                            <Form.Control placeholder={workoutMeasurePlaceholder} defaultValue={workoutMeasure} key={"EditWorkoutMeasure"+i} onChange={e => setUpdatedWorkoutMeasure(e.target.value)}/>
-                            <p>{units}</p>
-                            <Button className="DoneEditWorkoutButton" variant="secondary" key={"DoneWorkoutButton"+i} value={i} onClick={e => confirmEditWorkout(set, e.target.value)}>
-                                Done
-                            </Button>
-                            <Button className="CancelEditWorkoutButton" variant="danger" key={"CancelWorkoutButton"+i} onClick={e => setShowEditWorkoutFields(-1)}>
-                                Cancel
-                            </Button>
-                        </>
-                        : <>
-                            { (measureType == "workoutTime") &&
-                                <>
-                                    <Card.Title key={"WorkoutCardTitle"+i}> Workout Time: </Card.Title>
-                                    <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure + " seconds"} </Card.Text>
-                                </>
-                            }
-                            { (measureType == "workoutReps") &&
-                                <>
-                                    <Card.Title key={"WorkoutCardTitle"+i}> Number of Reps: </Card.Title>
-                                    <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure + " reps"} </Card.Text>
-                                </>
-                            }
-                        </>
-                }
-            </Card.Body>
+            <Form className="form-inline EditSetForm">
+                <Form.Control
+                    ref={emptySetNameOverlayTarget}
+                    className="EditSetFormControl"
+                    placeholder="Edit Set Name"
+                    defaultValue={workoutSetName}
+                    key={"EditSetForm"+i}
+                    onChange={e => onChangeEditWorkoutSetName(e, allSets, i, setUpdatedWorkoutSetName, setEmptySetNameError, setDuplicateSetNameError)}/>
+                <Overlay target={emptySetNameOverlayTarget.current} show={emptySetNameError} placement="left">
+                    {(props) => (
+                    <Tooltip id="overlay-example" {...props}>
+                        Please enter a non-empty set name.
+                    </Tooltip>
+                    )}
+                </Overlay>
+                <Overlay target={emptySetNameOverlayTarget.current} show={duplicateSetNameError} placement="left">
+                    {(props) => (
+                    <Tooltip id="overlay-example" {...props}>
+                        Please enter a non-existing set name.
+                    </Tooltip>
+                    )}
+                </Overlay>
+                <Button
+                    disabled={emptySetNameError || duplicateSetNameError}
+                    className="EditSetButtons"
+                    variant="info"
+                    key={"ConfirmEditSetButton"+i}
+                    onClick={e => confirmEditWorkoutSet(allData, allSets, updatedWorkoutSetName, i, setShowEditSetFields, setAllSets, setAllData, setKey)}>
+                    <MDBIcon icon="check"/>
+                </Button>
+                <Button className="EditSetButtons" variant="danger" key={"CancelEditSetButton"+i} onClick={e => setShowEditSetFields(-1)}>
+                    <MDBIcon icon="times"/>
+                </Button>
+            </Form>
         );
     }
 
+    function displayEachSet(workoutSetName, i) {
+        return (
+            <NavLink
+                className="SetTab"
+                onSelect={e => onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setShowEditSetFields)}
+                key={"set"+i}
+                id={i}
+                eventKey={i}>
+                {workoutSetName}   
+                <Button className="ModifySetButton" variant="outline-dark" key={"DeleteSetButton"+i} onClick={e => onClickDeleteSetButton(allData, workoutSetName, setShowDeleteSetModal, setDeletedSet, setDeletedSetLength)}>
+                    <MDBIcon icon="trash"/>
+                </Button>
+                <Button
+                    className="ModifySetButton"
+                    variant="outline-dark"
+                    key={"EditSetButton"+i}
+                    onClick={e => onClickEditSetButton(workoutSetName, i, setShowEditSetFields, setUpdatedWorkoutSetName)}>
+                    <MDBIcon icon="edit"/>
+                </Button>
+            </NavLink>
+        );
+    }
+
+    /*** DISPLAY WORKOUT ***/
+
     // Display all workouts in a set as Card
-    function viewWorkouts(set) {
+    function displayAllWorkouts(set) {
         let allWorkoutsArray = [];
         let workouts = allData[set];
 
@@ -271,8 +205,15 @@ export default function ViewNotes() {
             
             allWorkoutsArray.push(
                 <Card className="WorkoutCard" key={"WorkoutCardKey"+i}>
-                    {displayWorkoutName(set, workoutName, measureType, workoutMeasure, i)}
-                    {displayWorkoutMeasure(set, measureType, workoutMeasure, i)}
+                    {
+                        showEditWorkoutFields == i
+                        ? <>
+                            {displayEditWorkoutFields(set, workoutName, workoutMeasure, i)}
+                        </>
+                        : <>
+                            {displayEachWorkout(set, workoutName, measureType, workoutMeasure, i)}
+                        </>
+                    }
                 </Card>
             );
         }
@@ -280,230 +221,96 @@ export default function ViewNotes() {
         return allWorkoutsArray;
     }
 
-    // Display modal to confirm the deletion of a specific workout
-    function displayDeleteWorkoutModal() {
+    function displayEditWorkoutFields(set, workoutName, workoutMeasure, i) {
         return (
-            <Modal show={showDeleteWorkoutModal} onHide={e => setShowDeleteWorkoutModal(false)} style={{opacity:1}}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Are you sure you want to delete this workout? </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p className="WorkoutNameInModal">{deletedWorkoutName}</p>
-                    {deletedWorkoutMeasureType == "workoutReps" && 
-                        <>
-                            <p className="WorkoutTypeInModal">Number of Reps:</p>
-                            <p className="WorkoutMeasureInModal">{deletedWorkoutMeasure} reps</p>
-                        </>
-                    }
-                    {deletedWorkoutMeasureType == "workoutTime" &&
-                        <>
-                            <p className="WorkoutTypeInModal">Workout Time:</p>
-                            <p className="WorkoutMeasureInModal">{deletedWorkoutMeasure} seconds</p>
-                        </>
-                    }
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={e => setShowDeleteWorkoutModal(false)} variant="secondary">Cancel</Button>
-                    <Button onClick={e => confirmedDeleteWorkout(deletedWorkoutSetName, deletedWorkoutIndex)} variant="danger">Delete</Button>
-                </Modal.Footer>
-            </Modal>
+            <>
+                <Card.Header className="WorkoutHeader" key={"CardHeaderKey"+i}>
+                    <Form.Control
+                        placeholder="Edit Workout Name"
+                        defaultValue={workoutName}
+                        key={"EditWorkoutForm"+i}
+                        onChange={e => setUpdatedWorkoutName(e.target.value)}/>
+                </Card.Header>
+                <Card.Body key={"CardBodyKey"+i}>
+                    <DropdownButton
+                        size="lg"
+                        variant="outline-dark"
+                        onSelect={e => workoutMeasureFields(e, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType)}
+                        title={DropDownTitle}
+                        key={"WorkoutMeasureTypeDropdown"+i}>
+                        <Dropdown.Item
+                            eventKey="workoutTime">
+                                Workout Time
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            eventKey="workoutReps">
+                                Number of Reps
+                        </Dropdown.Item>
+                    </DropdownButton>
+                    <Form.Control
+                        placeholder={workoutMeasurePlaceholder}
+                        defaultValue={workoutMeasure}
+                        key={"EditWorkoutMeasure"+i}
+                        onChange={e => setUpdatedWorkoutMeasure(e.target.value)}/>
+                        <p>{units}</p>
+                        <Button
+                        className="DoneEditWorkoutButton"
+                        variant="secondary"
+                        key={"DoneWorkoutButton"+i}
+                        value={i}
+                        onClick={e => confirmEditWorkout(allData, set, updatedWorkoutName, updatedWorkoutMeasureType, updatedWorkoutMeasure, i, setShowEditWorkoutFields, setAllData)}>
+                        Done
+                    </Button>
+                    <Button
+                        className="CancelEditWorkoutButton"
+                        variant="danger"
+                        key={"CancelWorkoutButton"+i}
+                        onClick={e => setShowEditWorkoutFields(-1)}>
+                        Cancel
+                    </Button>
+                </Card.Body>
+            </>
         );
     }
 
-    function displayDeleteSetModal() {
+    function displayEachWorkout(set, workoutName, measureType, workoutMeasure, i) {
         return (
-            <Modal show={showDeleteSetModal} onHide={e => setShowDeleteSetModal(false)} style={{opacity:1}}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Are you sure you want to delete this set? </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p className="SetNameInModal">{deletedSet}</p>
-                    <p className="SetLengthInModal"> Total workouts: {deletedSetLength}</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={e => setShowDeleteSetModal(false)} variant="secondary">Cancel</Button>
-                    <Button onClick={e => confirmDeleteWorkoutSet()} variant="danger">Delete</Button>
-                </Modal.Footer>
-            </Modal>
+            <>
+                <Card.Header className="WorkoutHeader" key={"CardHeaderKey"+i}>
+                    {workoutName}
+                    <Button
+                        className="ModifyWorkoutButton"
+                        variant="danger"
+                        key={"DeleteWorkoutButton"+i}
+                        onClick={e => onClickDeleteWorkoutButton(set, workoutName, measureType, workoutMeasure, i, setShowDeleteWorkoutModal, setDeletedWorkoutSetName, setDeletedWorkoutName, setDeletedWorkoutMeasureType, setDeletedWorkoutMeasure, setDeletedWorkoutIndex)}>
+                        Delete Workout
+                        <MDBIcon icon="trash" className="ml-2"/>
+                    </Button>
+                    <Button
+                        className="ModifyWorkoutButton"
+                        variant="primary"
+                        key={"EditWorkoutButton"+i}
+                        onClick={e => onClickEditWorkoutButton(measureType, workoutName, workoutMeasure, i, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, workoutMeasureFields, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType)}>
+                        Edit Workout
+                        <MDBIcon icon="edit" className="ml-2"/>
+                    </Button>
+                </Card.Header>
+                <Card.Body key={"CardBodyKey"+i}>
+                    {(measureType == "workoutTime") &&
+                        <>
+                            <Card.Title key={"WorkoutCardTitle"+i}> Workout Time: </Card.Title>
+                            <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure + " seconds"} </Card.Text>
+                        </>
+                    }
+                    {(measureType == "workoutReps") &&
+                        <>
+                            <Card.Title key={"WorkoutCardTitle"+i}> Number of Reps: </Card.Title>
+                            <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure + " reps"} </Card.Text>
+                        </>
+                    }
+                </Card.Body>
+            </>
         );
-    }
-
-    // When user clicked
-    function onClickDeleteSetButton(setName) {
-        setShowDeleteSetModal(true);
-        setDeletedSet(setName);
-        setDeletedSetLength(allData[setName].length);
-    }
-
-    function rerenderAfterDeletingSetName() {
-        let updatedData = {...allData}
-        delete updatedData[deletedSet];
-        setAllData(updatedData);
-        setAllSets(Object.keys(updatedData));
-    }
-
-    function confirmDeleteWorkoutSet() {
-        setShowDeleteSetModal(false);
-        rerenderAfterDeletingSetName();
-
-        let request = {
-            method: "post",
-            headers: {
-            "Content-Type":"application/json"
-            },
-            body: JSON.stringify({
-            deletedWorkoutSetName: deletedSet
-            })
-        };
-
-        fetch('/delete_set', request).then(response => console.log(response));
-    }
-
-    // Edit set icon is clicked
-    function onClickEditSetButton(setName, i) {
-        setShowEditSetFields(i);
-        setUpdatedWorkoutSetName(setName);
-    }
-
-    
-    // Rerender page after finish editing set name
-    function rerenderAfterEditingSetName(workoutSetName, i) {
-        let updatedSets = [...allSets];
-        updatedSets[i] = updatedWorkoutSetName;
-        setAllSets(updatedSets);
-
-        // rename key
-        let updatedData = {...allData};
-        updatedData[updatedWorkoutSetName] = updatedData[workoutSetName];
-        delete updatedData[workoutSetName];
-        console.log(updatedData);
-        setAllData(updatedData);
-        setKey(updatedWorkoutSetName); // remove i think
-    }
-
-    // When clicks the "check" icon to submit set name edit
-    function confirmEditWorkoutSet(workoutSetName, i) {
-        setShowEditSetFields(-1);
-        if(workoutSetName != updatedWorkoutSetName) {
-            rerenderAfterEditingSetName(workoutSetName, i);
-        }
-        
-        let request = {
-            method: "post",
-            headers: {
-            "Content-Type":"application/json"
-            },
-            body: JSON.stringify({
-            originalWorkoutSetName: workoutSetName,
-            updatedWorkoutSetName: updatedWorkoutSetName
-            })
-        };
-
-        fetch('/edit_set', request).then(response => console.log(response));
-    }
-
-    // "Delete workout" button is clicked
-    function onClickDeleteWorkoutButton(setName, workoutName, workoutMeasureType, workoutMeasure, index) {
-        setShowDeleteWorkoutModal(true);
-        setDeletedWorkoutName(workoutName);
-        setDeletedWorkoutMeasureType(workoutMeasureType);
-        setDeletedWorkoutMeasure(workoutMeasure);
-        setDeletedWorkoutSetName(setName);
-        setDeletedWorkoutIndex(index);
-    }
-
-    // Rerender page after finish deleting workout
-    function rerenderAfterDeletingWorkout(set, index) {
-        let updatedWorkouts = {...allData};
-        updatedWorkouts[set].splice(index, 1);
-        setAllData(updatedWorkouts);
-    }
-
-    // When deleting a workout is confirmed
-    function confirmedDeleteWorkout(set, index) {
-        setShowDeleteWorkoutModal(false);
-        rerenderAfterDeletingWorkout(set, index);
-
-        let request = {
-            method: "post",
-            headers: {
-            "Content-Type":"application/json"
-            },
-            body: JSON.stringify({
-            workoutSetName: set,
-            workoutIndex: index,
-            })
-        };
-
-        fetch('/delete_workout', request).then(response => console.log(response));
-    }
-
-    // "Edit workout" button is clicked
-    function onClickEditWorkoutButton(set, type, name, measure, index) {
-        setShowEditWorkoutFields(index);
-        setUpdatedWorkoutName(name);
-        setUpdatedWorkoutMeasure(measure);
-        workoutMeasureFields(type); 
-    }
-
-    // Rerender page after finish editing workout
-    function rerenderAfterEditingWorkout(set, index) {
-        let updatedWorkouts = {...allData};
-        let updatedWorkout = {};
-
-        if(updatedWorkoutMeasureType == "workoutReps")
-        updatedWorkout = {
-            workoutName: updatedWorkoutName,
-            workoutReps: updatedWorkoutMeasure
-        }
-        else if(updatedWorkoutMeasureType == "workoutTime")
-        updatedWorkout = {
-            workoutName: updatedWorkoutName,
-            workoutTime: updatedWorkoutMeasure
-        }
-
-        updatedWorkouts[set].splice(index, 1); // delete original workout
-        updatedWorkouts[set].splice(index, 0, updatedWorkout); // insert new workout
-        
-        setShowEditWorkoutFields(-1);
-        setAllData(updatedWorkouts);
-    }
-
-    // Calls edit_workout API when user done editing
-    function confirmEditWorkout(set, index) {
-        rerenderAfterEditingWorkout(set, index);
-        
-        let request = {};
-        if(updatedWorkoutMeasureType == "workoutReps") {
-            request = {
-                method: "post",
-                headers: {
-                "Content-Type":"application/json"
-                },
-                body: JSON.stringify({
-                workoutSetName: set,
-                workoutIndex: index,
-                workoutName: updatedWorkoutName,
-                workoutReps: updatedWorkoutMeasure
-                })
-            };
-        }
-        else if(updatedWorkoutMeasureType == "workoutTime") {
-            request = {
-                method: "post",
-                headers: {
-                "Content-Type":"application/json"
-                },
-                body: JSON.stringify({
-                workoutSetName: set,
-                workoutIndex: index,
-                workoutName: updatedWorkoutName,
-                workoutTime: updatedWorkoutMeasure
-                })
-            };
-        }
-      
-        fetch('/edit_workout', request).then(response => console.log(response));
     }
 
   return (
@@ -521,7 +328,7 @@ export default function ViewNotes() {
                 </Col>
                 <Col sm={9}>
                     <TabContent>
-                        {includes(key, allSets) && viewWorkouts(key)}
+                        {includes(key, allSets) && displayAllWorkouts(key)}
                     </TabContent>
                 </Col>
             </Row>
