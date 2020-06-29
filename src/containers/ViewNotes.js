@@ -1,14 +1,16 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Overlay, Tooltip, Modal, DropdownButton, Form, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem, NavLink } from "react-bootstrap";
-import { MDBBtn, MDBIcon } from 'mdbreact';
+import { MDBIcon } from 'mdbreact';
 import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
 import { confirmEditWorkout, confirmDeleteWorkout, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, workoutMeasureFields } from "../controllers/DisplayWorkoutsController.js"
+import { onChangeNewSetName, onChangeNewWorkoutMeasure, onClickNewWorkoutDoneButton, onSelectNewWorkoutDropdown } from "../controllers/AddNewSetController.js";
 import "./ViewNotes.css"
 
 export default function ViewNotes() {
     const [allSets, setAllSets] = useState([]);
     const [allData, setAllData] = useState({});
     const [key, setKey] = useState("");
+    const [setSelected, setSetSelected] = useState(false);
     const [emptySetNameError, setEmptySetNameError] = useState(false);
     const [duplicateSetNameError, setDuplicateSetNameError] = useState(false);
     const [showEditWorkoutFields, setShowEditWorkoutFields] = useState(-1);
@@ -24,11 +26,22 @@ export default function ViewNotes() {
     const [deletedWorkoutMeasureType, setDeletedWorkoutMeasureType] = useState("");
     const [deletedWorkoutMeasure, setDeletedWorkoutMeasure] = useState(0);
     const [deletedWorkoutIndex, setDeletedWorkoutIndex] = useState(-1);
-    const [DropDownTitle, setDropDownTitle] = useState("");
+    const [editWorkoutUnits, setEditWorkoutUnits] = useState("");
+    const [editWorkoutDropDownTitle, setEditWorkoutDropDownTitle] = useState("");
     const [workoutMeasurePlaceholder, setWorkoutMeasurePlaceholder] = useState("");
     const [showDeleteWorkoutModal, setShowDeleteWorkoutModal] = useState(false);
     const [showDeleteSetModal, setShowDeleteSetModal] = useState(false);
-    const [units, setUnits] = useState("");
+
+    // add new set
+    const [showNewSetFields, setShowNewSetFields] = useState(false);
+    const [newWorkoutMeasureType,setNewWorkoutMeasureType] = useState("Select Workout Measure");
+    const [disableNewWorkoutMeasure, setDisableNewWorkoutMeasure] = useState(true);
+    const [disableNewWorkoutDropdown, setDisableNewWorkoutDropdown] = useState(true);
+    const [disableNewWorkoutDoneButton, setDisableNewWorkoutDoneButton] = useState(true);
+    const [newWorkoutUnits, setNewWorkoutUnits] = useState("");
+    const [newWorkoutName, setNewWorkoutName] = useState("");
+    const [newWorkoutMeasure, setNewWorkoutMeasure] = useState("");
+
     const emptySetNameOverlayTarget = useRef(null);
 
     useEffect(() => {
@@ -159,7 +172,7 @@ export default function ViewNotes() {
         return (
             <NavLink
                 className="SetTab"
-                onSelect={e => onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setShowEditSetFields)}
+                onSelect={e => onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setSetSelected, setShowEditSetFields)}
                 key={"set"+i}
                 id={i}
                 eventKey={i}>
@@ -178,6 +191,70 @@ export default function ViewNotes() {
         );
     }
 
+    /*** DISPLAY NEW SET ***/
+
+    function addNewWorkout(set) {
+        return (
+            <>
+                <Button key="NewWorkoutButton" size="lg" block variant="light" onClick={e => setShowNewSetFields(!showNewSetFields)}>
+                    <MDBIcon key="NewWorkoutButtonIcon" icon="plus"/>
+                    {'\t'} Add New Workout
+                </Button>
+                { showNewSetFields &&
+                    <Card key="NewWorkoutCard">
+                        <Card.Header key="NewWorkoutCardHeader" className="NewWorkoutHeader">
+                            <Form.Control
+                                key="NewWorkoutForm"
+                                placeholder="New Workout Name"
+                                onChange={e => onChangeNewSetName(e, setNewWorkoutName, setDisableNewWorkoutDropdown)}/>
+                        </Card.Header>
+                        <Card.Body key="NewWorkoutCardBody">
+                            <DropdownButton
+                                disabled={disableNewWorkoutDropdown}
+                                key="NewWorkoutMeasureTypeDropdown"
+                                size="lg"
+                                variant="outline-dark"
+                                onSelect={e => onSelectNewWorkoutDropdown(e, setNewWorkoutMeasureType, setDisableNewWorkoutMeasure, setNewWorkoutUnits)}
+                                title={newWorkoutMeasureType}>
+                                <Dropdown.Item
+                                    key="newWorkoutDropdownWorkoutTime"
+                                    eventKey="Workout Time">
+                                        Workout Time
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    key="newWorkoutDropdownWorkoutReps"
+                                    eventKey="Number of Reps">
+                                        Number of Reps
+                                </Dropdown.Item>
+                            </DropdownButton>
+                            <Form.Control
+                                key="NewWorkoutMeasure"
+                                disabled={disableNewWorkoutMeasure}
+                                placeholder={workoutMeasurePlaceholder}
+                                onChange={e => onChangeNewWorkoutMeasure(e, setNewWorkoutMeasure, setDisableNewWorkoutDoneButton)}/>
+                                <p>{newWorkoutUnits}</p>
+                                <Button
+                                    disabled={disableNewWorkoutDoneButton}
+                                    className="DoneNewWorkoutButton"
+                                    variant="secondary"
+                                    key="DoneNewWorkoutButton"
+                                    onClick={e => onClickNewWorkoutDoneButton(allData, set, newWorkoutName, newWorkoutMeasureType, newWorkoutMeasure, setShowNewSetFields, setAllData)}>
+                                    Done
+                                </Button>
+                                <Button
+                                    key="CancelNewWorkoutButton"
+                                    className="CancelNewWorkoutButton"
+                                    variant="danger"
+                                    onClick={e => setShowNewSetFields(false)}>
+                                    Cancel
+                                </Button>
+                        </Card.Body>
+                    </Card>
+                }       
+            </>
+        );
+    }
+
     /*** DISPLAY WORKOUT ***/
 
     // Display all workouts in a set as Card
@@ -186,7 +263,9 @@ export default function ViewNotes() {
         let workouts = allData[set];
 
         if(workouts.length == 0) {
-            return <p className="NoWorkoutToDisplayText"> No workouts have been added to this set. </p>
+            return (
+                <p className="NoWorkoutToDisplayText"> No workouts have been added to this set. </p>
+            );
         }
 
         for(var i=0; i < workouts.length; i++) {
@@ -224,7 +303,7 @@ export default function ViewNotes() {
     function displayEditWorkoutFields(set, workoutName, workoutMeasure, i) {
         return (
             <>
-                <Card.Header className="WorkoutHeader" key={"CardHeaderKey"+i}>
+                <Card.Header className="WorkoutHeader" key={"WorkoutCardHeader"+i}>
                     <Form.Control
                         placeholder="Edit Workout Name"
                         defaultValue={workoutName}
@@ -235,15 +314,15 @@ export default function ViewNotes() {
                     <DropdownButton
                         size="lg"
                         variant="outline-dark"
-                        onSelect={e => workoutMeasureFields(e, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType)}
-                        title={DropDownTitle}
+                        onSelect={e => workoutMeasureFields(e, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}
+                        title={editWorkoutDropDownTitle}
                         key={"WorkoutMeasureTypeDropdown"+i}>
                         <Dropdown.Item
-                            eventKey="workoutTime">
+                            eventKey="Workout Time">
                                 Workout Time
                         </Dropdown.Item>
                         <Dropdown.Item
-                            eventKey="workoutReps">
+                            eventKey="Number of Reps">
                                 Number of Reps
                         </Dropdown.Item>
                     </DropdownButton>
@@ -252,7 +331,7 @@ export default function ViewNotes() {
                         defaultValue={workoutMeasure}
                         key={"EditWorkoutMeasure"+i}
                         onChange={e => setUpdatedWorkoutMeasure(e.target.value)}/>
-                        <p>{units}</p>
+                        <p>{editWorkoutUnits}</p>
                         <Button
                         className="DoneEditWorkoutButton"
                         variant="secondary"
@@ -290,7 +369,7 @@ export default function ViewNotes() {
                         className="ModifyWorkoutButton"
                         variant="primary"
                         key={"EditWorkoutButton"+i}
-                        onClick={e => onClickEditWorkoutButton(measureType, workoutName, workoutMeasure, i, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, workoutMeasureFields, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType)}>
+                        onClick={e => onClickEditWorkoutButton(measureType, workoutName, workoutMeasure, i, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, workoutMeasureFields, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}>
                         Edit Workout
                         <MDBIcon icon="edit" className="ml-2"/>
                     </Button>
@@ -329,6 +408,7 @@ export default function ViewNotes() {
                 <Col sm={9}>
                     <TabContent>
                         {includes(key, allSets) && displayAllWorkouts(key)}
+                        {setSelected && addNewWorkout(key)}
                     </TabContent>
                 </Col>
             </Row>

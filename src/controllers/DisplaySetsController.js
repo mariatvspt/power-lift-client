@@ -52,8 +52,9 @@ export function onClickDeleteSetButton(allData, workoutSetName, setShowDeleteSet
 /*** ON SELECT ***/
 
 // When user select a workout set tab
-export function onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setShowEditSetFields) {
+export function onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setSetSelected, setShowEditSetFields) {
     setKey(allSets[e]);
+    setSetSelected(true);
 
     // reset classname for enabling/disabling hover for the icons
     const elements = document.getElementsByClassName("SetTab");

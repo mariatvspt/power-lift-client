@@ -17,7 +17,16 @@
     float: right;
 }
 
+.CancelNewWorkoutButton {
+    margin-right: 5px;
+    float: right;
+}
+
 .DoneEditWorkoutButton {
+    float: right;
+}
+
+.DoneNewWorkoutButton {
     float: right;
 }
 
