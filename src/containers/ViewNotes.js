@@ -191,7 +191,7 @@ export default function ViewNotes() {
         );
     }
 
-    /*** DISPLAY NEW SET ***/
+    /*** DISPLAY NEW WORKOUT ***/
 
     function addNewWorkout(set) {
         return (
