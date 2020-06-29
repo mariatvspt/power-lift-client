@@ -191,70 +191,6 @@ export default function ViewNotes() {
         );
     }
 
-    /*** DISPLAY NEW WORKOUT ***/
-
-    function addNewWorkout(set) {
-        return (
-            <>
-                <Button key="NewWorkoutButton" size="lg" block variant="light" onClick={e => setShowNewSetFields(!showNewSetFields)}>
-                    <MDBIcon key="NewWorkoutButtonIcon" icon="plus"/>
-                    {'\t'} Add New Workout
-                </Button>
-                { showNewSetFields &&
-                    <Card key="NewWorkoutCard">
-                        <Card.Header key="NewWorkoutCardHeader" className="NewWorkoutHeader">
-                            <Form.Control
-                                key="NewWorkoutForm"
-                                placeholder="New Workout Name"
-                                onChange={e => onChangeNewSetName(e, setNewWorkoutName, setDisableNewWorkoutDropdown)}/>
-                        </Card.Header>
-                        <Card.Body key="NewWorkoutCardBody">
-                            <DropdownButton
-                                disabled={disableNewWorkoutDropdown}
-                                key="NewWorkoutMeasureTypeDropdown"
-                                size="lg"
-                                variant="outline-dark"
-                                onSelect={e => onSelectNewWorkoutDropdown(e, setNewWorkoutMeasureType, setDisableNewWorkoutMeasure, setNewWorkoutUnits)}
-                                title={newWorkoutMeasureType}>
-                                <Dropdown.Item
-                                    key="newWorkoutDropdownWorkoutTime"
-                                    eventKey="Workout Time">
-                                        Workout Time
-                                </Dropdown.Item>
-                                <Dropdown.Item
-                                    key="newWorkoutDropdownWorkoutReps"
-                                    eventKey="Number of Reps">
-                                        Number of Reps
-                                </Dropdown.Item>
-                            </DropdownButton>
-                            <Form.Control
-                                key="NewWorkoutMeasure"
-                                disabled={disableNewWorkoutMeasure}
-                                placeholder={workoutMeasurePlaceholder}
-                                onChange={e => onChangeNewWorkoutMeasure(e, setNewWorkoutMeasure, setDisableNewWorkoutDoneButton)}/>
-                                <p>{newWorkoutUnits}</p>
-                                <Button
-                                    disabled={disableNewWorkoutDoneButton}
-                                    className="DoneNewWorkoutButton"
-                                    variant="secondary"
-                                    key="DoneNewWorkoutButton"
-                                    onClick={e => onClickNewWorkoutDoneButton(allData, set, newWorkoutName, newWorkoutMeasureType, newWorkoutMeasure, setShowNewSetFields, setAllData)}>
-                                    Done
-                                </Button>
-                                <Button
-                                    key="CancelNewWorkoutButton"
-                                    className="CancelNewWorkoutButton"
-                                    variant="danger"
-                                    onClick={e => setShowNewSetFields(false)}>
-                                    Cancel
-                                </Button>
-                        </Card.Body>
-                    </Card>
-                }       
-            </>
-        );
-    }
-
     /*** DISPLAY WORKOUT ***/
 
     // Display all workouts in a set as Card
@@ -388,6 +324,70 @@ export default function ViewNotes() {
                         </>
                     }
                 </Card.Body>
+            </>
+        );
+    }
+
+    /*** DISPLAY NEW WORKOUT FIELDS ***/
+
+    function addNewWorkout(set) {
+        return (
+            <>
+                <Button key="NewWorkoutButton" size="lg" block variant="light" onClick={e => setShowNewSetFields(!showNewSetFields)}>
+                    <MDBIcon key="NewWorkoutButtonIcon" icon="plus"/>
+                    {'\t'} Add New Workout
+                </Button>
+                { showNewSetFields &&
+                    <Card key="NewWorkoutCard">
+                        <Card.Header key="NewWorkoutCardHeader" className="NewWorkoutHeader">
+                            <Form.Control
+                                key="NewWorkoutForm"
+                                placeholder="New Workout Name"
+                                onChange={e => onChangeNewSetName(e, setNewWorkoutName, setDisableNewWorkoutDropdown)}/>
+                        </Card.Header>
+                        <Card.Body key="NewWorkoutCardBody">
+                            <DropdownButton
+                                disabled={disableNewWorkoutDropdown}
+                                key="NewWorkoutMeasureTypeDropdown"
+                                size="lg"
+                                variant="outline-dark"
+                                onSelect={e => onSelectNewWorkoutDropdown(e, setNewWorkoutMeasureType, setDisableNewWorkoutMeasure, setNewWorkoutUnits)}
+                                title={newWorkoutMeasureType}>
+                                <Dropdown.Item
+                                    key="newWorkoutDropdownWorkoutTime"
+                                    eventKey="Workout Time">
+                                        Workout Time
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    key="newWorkoutDropdownWorkoutReps"
+                                    eventKey="Number of Reps">
+                                        Number of Reps
+                                </Dropdown.Item>
+                            </DropdownButton>
+                            <Form.Control
+                                key="NewWorkoutMeasure"
+                                disabled={disableNewWorkoutMeasure}
+                                placeholder={workoutMeasurePlaceholder}
+                                onChange={e => onChangeNewWorkoutMeasure(e, setNewWorkoutMeasure, setDisableNewWorkoutDoneButton)}/>
+                                <p>{newWorkoutUnits}</p>
+                                <Button
+                                    disabled={disableNewWorkoutDoneButton}
+                                    className="DoneNewWorkoutButton"
+                                    variant="secondary"
+                                    key="DoneNewWorkoutButton"
+                                    onClick={e => onClickNewWorkoutDoneButton(allData, set, newWorkoutName, newWorkoutMeasureType, newWorkoutMeasure, setShowNewSetFields, setAllData)}>
+                                    Done
+                                </Button>
+                                <Button
+                                    key="CancelNewWorkoutButton"
+                                    className="CancelNewWorkoutButton"
+                                    variant="danger"
+                                    onClick={e => setShowNewSetFields(false)}>
+                                    Cancel
+                                </Button>
+                        </Card.Body>
+                    </Card>
+                }       
             </>
         );
     }
