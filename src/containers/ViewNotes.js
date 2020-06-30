@@ -12,24 +12,34 @@ export default function ViewNotes() {
     const [allData, setAllData] = useState({});
     const [key, setKey] = useState("");
     const [setSelected, setSetSelected] = useState(false);
+    
+    // edit set
     const [emptySetNameError, setEmptySetNameError] = useState(false);
     const [duplicateSetNameError, setDuplicateSetNameError] = useState(false);
-    const [showEditWorkoutFields, setShowEditWorkoutFields] = useState(-1);
     const [showEditSetFields, setShowEditSetFields] = useState(-1);
     const [updatedWorkoutSetName, setUpdatedWorkoutSetName] = useState("");
+
+    // delete set
+    const [deletedSet, setDeletedSet] = useState("");
+    const [deletedSetLength, setDeletedSetLength] = useState(-1);
+
+    // edit workout
+    const [showEditWorkoutFields, setShowEditWorkoutFields] = useState(-1);
+    const [editWorkoutDropDownTitle, setEditWorkoutDropDownTitle] = useState("");
+    const [editWorkoutUnits, setEditWorkoutUnits] = useState("");
+    const [workoutMeasurePlaceholder, setWorkoutMeasurePlaceholder] = useState("");
     const [updatedWorkoutName, setUpdatedWorkoutName] = useState("");
     const [updatedWorkoutMeasure, setUpdatedWorkoutMeasure] = useState(0);
     const [updatedWorkoutMeasureType, setUpdatedWorkoutMeasureType] = useState("");
-    const [deletedSet, setDeletedSet] = useState("");
-    const [deletedSetLength, setDeletedSetLength] = useState(-1);
+    
+    // delete workout
     const [deletedWorkoutSetName, setDeletedWorkoutSetName] = useState("");
     const [deletedWorkoutName, setDeletedWorkoutName] = useState("");
     const [deletedWorkoutMeasureType, setDeletedWorkoutMeasureType] = useState("");
     const [deletedWorkoutMeasure, setDeletedWorkoutMeasure] = useState(0);
     const [deletedWorkoutIndex, setDeletedWorkoutIndex] = useState(-1);
-    const [editWorkoutUnits, setEditWorkoutUnits] = useState("");
-    const [editWorkoutDropDownTitle, setEditWorkoutDropDownTitle] = useState("");
-    const [workoutMeasurePlaceholder, setWorkoutMeasurePlaceholder] = useState("");
+
+    // show modal
     const [showDeleteWorkoutModal, setShowDeleteWorkoutModal] = useState(false);
     const [showDeleteSetModal, setShowDeleteSetModal] = useState(false);
 
@@ -64,6 +74,7 @@ export default function ViewNotes() {
     }, []);
 
     /*** DISPLAY TOOLTIP ***/
+
     function displaySetNameTooltip(overlayTarget, emptyError, duplicateError) {
         return (
             <>
@@ -105,7 +116,6 @@ export default function ViewNotes() {
         );
     }
 
-     // Display modal to confirm the deletion of a specific workout
      function displayDeleteWorkoutModal() {
         return (
             <Modal show={showDeleteWorkoutModal} onHide={e => setShowDeleteWorkoutModal(false)} style={{opacity:1}}>
@@ -137,7 +147,6 @@ export default function ViewNotes() {
 
     /*** DISPLAY SETS ***/
 
-    // Display all sets as NavItem
     function displayAllSets() {
         let allSetsArray = [];
 
@@ -210,7 +219,6 @@ export default function ViewNotes() {
 
     /*** DISPLAY WORKOUT ***/
 
-    // Display all workouts in a set as Card
     function displayAllWorkouts(set) {
         let allWorkoutsArray = [];
         let workouts = allData[set];
