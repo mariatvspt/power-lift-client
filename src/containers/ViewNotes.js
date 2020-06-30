@@ -3,7 +3,8 @@ import { Overlay, Tooltip, Modal, DropdownButton, Form, Button, Dropdown, Card, 
 import { MDBIcon } from 'mdbreact';
 import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
 import { confirmEditWorkout, confirmDeleteWorkout, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, workoutMeasureFields } from "../controllers/DisplayWorkoutsController.js"
-import { onChangeNewSetName, onChangeNewWorkoutMeasure, onClickNewWorkoutDoneButton, onSelectNewWorkoutDropdown } from "../controllers/AddNewSetController.js";
+import { onChangeNewWorkoutName, onChangeNewWorkoutMeasure, onClickNewWorkoutDoneButton, onSelectNewWorkoutDropdown } from "../controllers/AddNewWorkoutController.js";
+import { onChangeNewSetName, onClickNewSetDoneButton } from "../controllers/AddNewSetController.js";
 import "./ViewNotes.css"
 
 export default function ViewNotes() {
@@ -34,6 +35,12 @@ export default function ViewNotes() {
 
     // add new set
     const [showNewSetFields, setShowNewSetFields] = useState(false);
+    const [newSetName, setNewSetName] = useState("");
+    const [duplicateNewSetNameError, setDuplicateNewSetNameError] = useState(true);
+    const [emptyNewSetNameError, setEmptyNewSetNameError] = useState(true);
+
+    // add new workout
+    const [showNewWorkoutFields, setShowNewWorkoutFields] = useState(false);
     const [newWorkoutMeasureType,setNewWorkoutMeasureType] = useState("Select Workout Measure");
     const [disableNewWorkoutMeasure, setDisableNewWorkoutMeasure] = useState(true);
     const [disableNewWorkoutDropdown, setDisableNewWorkoutDropdown] = useState(true);
@@ -42,7 +49,8 @@ export default function ViewNotes() {
     const [newWorkoutName, setNewWorkoutName] = useState("");
     const [newWorkoutMeasure, setNewWorkoutMeasure] = useState("");
 
-    const emptySetNameOverlayTarget = useRef(null);
+    const setNameOverlayTarget = useRef(null);
+    const newSetNameOverlayTarget = useRef(null);
 
     useEffect(() => {
         // Fetch all sets with view_all API
@@ -54,6 +62,28 @@ export default function ViewNotes() {
         }
         fetchSets();
     }, []);
+
+    /*** DISPLAY TOOLTIP ***/
+    function displaySetNameTooltip(overlayTarget, emptyError, duplicateError) {
+        return (
+            <>
+                <Overlay target={overlayTarget.current} show={emptyError} placement="left">
+                    {(props) => (
+                    <Tooltip id="overlay-example" {...props}>
+                        Please enter a non-empty set name.
+                    </Tooltip>
+                    )}
+                </Overlay>
+                <Overlay target={overlayTarget.current} show={duplicateError} placement="left">
+                    {(props) => (
+                    <Tooltip id="overlay-example" {...props}>
+                        Please enter a non-existing set name.
+                    </Tooltip>
+                    )}
+                </Overlay>
+            </>
+        );
+    }
 
     /*** DISPLAY MODALS ***/
 
@@ -133,26 +163,13 @@ export default function ViewNotes() {
         return (
             <Form className="form-inline EditSetForm">
                 <Form.Control
-                    ref={emptySetNameOverlayTarget}
+                    ref={setNameOverlayTarget}
                     className="EditSetFormControl"
                     placeholder="Edit Set Name"
                     defaultValue={workoutSetName}
                     key={"EditSetForm"+i}
                     onChange={e => onChangeEditWorkoutSetName(e, allSets, i, setUpdatedWorkoutSetName, setEmptySetNameError, setDuplicateSetNameError)}/>
-                <Overlay target={emptySetNameOverlayTarget.current} show={emptySetNameError} placement="left">
-                    {(props) => (
-                    <Tooltip id="overlay-example" {...props}>
-                        Please enter a non-empty set name.
-                    </Tooltip>
-                    )}
-                </Overlay>
-                <Overlay target={emptySetNameOverlayTarget.current} show={duplicateSetNameError} placement="left">
-                    {(props) => (
-                    <Tooltip id="overlay-example" {...props}>
-                        Please enter a non-existing set name.
-                    </Tooltip>
-                    )}
-                </Overlay>
+                {displaySetNameTooltip(setNameOverlayTarget, emptySetNameError, duplicateSetNameError)}
                 <Button
                     disabled={emptySetNameError || duplicateSetNameError}
                     className="EditSetButtons"
@@ -254,11 +271,11 @@ export default function ViewNotes() {
                         title={editWorkoutDropDownTitle}
                         key={"WorkoutMeasureTypeDropdown"+i}>
                         <Dropdown.Item
-                            eventKey="Workout Time">
+                            eventKey="workoutTime">
                                 Workout Time
                         </Dropdown.Item>
                         <Dropdown.Item
-                            eventKey="Number of Reps">
+                            eventKey="workoutReps">
                                 Number of Reps
                         </Dropdown.Item>
                     </DropdownButton>
@@ -328,22 +345,55 @@ export default function ViewNotes() {
         );
     }
 
-    /*** DISPLAY NEW WORKOUT FIELDS ***/
+    /*** DISPLAY NEW SET & WORKOUT FIELDS ***/
 
-    function addNewWorkout(set) {
+    function addNewSet() {
         return (
             <>
                 <Button key="NewWorkoutButton" size="lg" block variant="light" onClick={e => setShowNewSetFields(!showNewSetFields)}>
                     <MDBIcon key="NewWorkoutButtonIcon" icon="plus"/>
-                    {'\t'} Add New Workout
+                    {'\t'} Add New Set
                 </Button>
                 { showNewSetFields &&
+                    <Form className="form-inline EditSetForm">
+                    <Form.Control
+                        key="NewSetForm"
+                        ref={newSetNameOverlayTarget}
+                        className="EditSetFormControl"
+                        placeholder="New Set Name"
+                        onChange={e => onChangeNewSetName(e, allSets, setNewSetName, setEmptyNewSetNameError, setDuplicateNewSetNameError)}/>
+                    {displaySetNameTooltip(newSetNameOverlayTarget, emptyNewSetNameError, duplicateNewSetNameError)}
+                    <Button
+                        disabled={emptyNewSetNameError || duplicateNewSetNameError}
+                        key="NewSetDoneButton"
+                        className="EditSetButtons"
+                        variant="info"
+                        onClick={e => onClickNewSetDoneButton(allData, allSets, newSetName, setShowNewSetFields, setAllSets, setAllData)}>
+                        <MDBIcon icon="check"/>
+                    </Button>
+                    <Button key="CancelNewSetButton" className="EditSetButtons" variant="danger" onClick={e => setShowNewSetFields(false)}>
+                        <MDBIcon icon="times"/>
+                    </Button>
+                </Form>
+                }
+            </>
+        );
+    }
+
+    function addNewWorkout(set) {
+        return (
+            <>
+                <Button key="NewWorkoutButton" size="lg" block variant="light" onClick={e => setShowNewWorkoutFields(true)}>
+                    <MDBIcon key="NewWorkoutButtonIcon" icon="plus"/>
+                    {'\t'} Add New Workout
+                </Button>
+                { showNewWorkoutFields &&
                     <Card key="NewWorkoutCard">
                         <Card.Header key="NewWorkoutCardHeader" className="NewWorkoutHeader">
                             <Form.Control
                                 key="NewWorkoutForm"
                                 placeholder="New Workout Name"
-                                onChange={e => onChangeNewSetName(e, setNewWorkoutName, setDisableNewWorkoutDropdown)}/>
+                                onChange={e => onChangeNewWorkoutName(e, setNewWorkoutName, setDisableNewWorkoutDropdown)}/>
                         </Card.Header>
                         <Card.Body key="NewWorkoutCardBody">
                             <DropdownButton
@@ -375,14 +425,14 @@ export default function ViewNotes() {
                                     className="DoneNewWorkoutButton"
                                     variant="secondary"
                                     key="DoneNewWorkoutButton"
-                                    onClick={e => onClickNewWorkoutDoneButton(allData, set, newWorkoutName, newWorkoutMeasureType, newWorkoutMeasure, setShowNewSetFields, setAllData)}>
+                                    onClick={e => onClickNewWorkoutDoneButton(allData, set, newWorkoutName, newWorkoutMeasureType, newWorkoutMeasure, setShowNewWorkoutFields, setAllData)}>
                                     Done
                                 </Button>
                                 <Button
                                     key="CancelNewWorkoutButton"
                                     className="CancelNewWorkoutButton"
                                     variant="danger"
-                                    onClick={e => setShowNewSetFields(false)}>
+                                    onClick={e => setShowNewWorkoutFields(false)}>
                                     Cancel
                                 </Button>
                         </Card.Body>
@@ -402,7 +452,8 @@ export default function ViewNotes() {
                     <Nav className="Nav" variant="pills" className="flex-column">
                         {displayAllSets()}
                         <Dropdown.Divider />
-                        <NavLink onSelect={e => setKey(e)} eventKey="AllWorkouts">View All</NavLink>
+                        {/* <NavLink onSelect={e => setKey(e)} eventKey="AllWorkouts">View All</NavLink> */}
+                        {addNewSet()}
                     </Nav>
                 </Col>
                 <Col sm={9}>

@@ -3,7 +3,6 @@
 // check there is a duplicate in an array at a given index
 function checkDuplicates(target, array, index) {
     for(var i=0; i<array.length; i++) {
-        console.log(array[i], target);
         if(i != index && array[i] == target) {
             return true;
         }

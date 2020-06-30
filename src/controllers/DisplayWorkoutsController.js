@@ -11,14 +11,14 @@ export function includes(target, array) {
 }
 
  // Set state of the workout measure fields
-export function workoutMeasureFields(e, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType) {
+export function workoutMeasureFields(e, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType) {
     if(e == "workoutTime") {
-        setDropDownTitle("Workout Time");
+        setEditWorkoutDropDownTitle("Workout Time");
         setWorkoutMeasurePlaceholder("Edit workout time");
         setUnits("seconds");
     }
     else if(e == "workoutReps") {
-        setDropDownTitle("Number of Reps");
+        setEditWorkoutDropDownTitle("Number of Reps");
         setWorkoutMeasurePlaceholder("Edit number of reps");
         setUnits("reps")
     }

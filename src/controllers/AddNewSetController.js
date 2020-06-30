@@ -1,83 +1,58 @@
-/*** ON CHANGE ***/
-export function onChangeNewSetName(e, setNewWorkoutName, setDisableNewWorkoutDropdown) {
-    setNewWorkoutName(e.target.value);
-    
-    if(e.target.value.length > 0) {
-        setDisableNewWorkoutDropdown(false);
-    }        
-    else {
-        setDisableNewWorkoutDropdown(true);
+/*** HELPER FUNCTIONS ***/
+
+function checkDuplicates(target, array) {
+    for(var i=0; i<array.length; i++) {
+        if(array[i] == target) {
+            return true;
+        }
     }
+    return false;
 }
 
-export function onChangeNewWorkoutMeasure(e, setNewWorkoutMeasure, setDisableNewWorkoutDoneButton) {
-    setNewWorkoutMeasure(e.target.value);
+/*** ON CHANGE ***/
+export function onChangeNewSetName(e, allSets, setNewSetName, setEmptyNewSetNameError, setDuplicateNewSetNameError) {
+    setNewSetName(e.target.value);
 
-    if(e.target.value.length > 0) {
-        setDisableNewWorkoutDoneButton(false);
+    if(e.target.value == "") {
+        setEmptyNewSetNameError(true);
     }
     else {
-        setDisableNewWorkoutDoneButton(true);
+        setEmptyNewSetNameError(false);
+    }
+
+    if(checkDuplicates(e.target.value, allSets)) {
+        setDuplicateNewSetNameError(true);
+    }
+    else {
+        setDuplicateNewSetNameError(false);
     }
 }
 
 /*** ON CLICK ***/
-export function onClickNewWorkoutDoneButton(allData, setName, workoutName, workoutMeasureType, workoutMeasure, setShowNewSetFields, setAllData) {
+export function onClickNewSetDoneButton(allData, allSets, newSetName, setShowNewSetFields, setAllSets, setAllData) {
     setShowNewSetFields(false);
-    rerenderAfterAddingNewWorkout(allData, setName, workoutName, workoutMeasureType, workoutMeasure, setAllData)
+    rerenderAfterAddingNewSet(allData, allSets, newSetName, setAllSets, setAllData);
 
-    let request = {};
-    if(workoutMeasureType == "Number of Reps") {
-        request = {
-          method: "post",
-          headers: {
-            "Content-Type":"application/json"
-          },
-          body: JSON.stringify({
-            workoutSetName: setName,
-            workoutName: workoutName,
-            workoutReps: workoutMeasure
-          })
-        };
-      }
-      else if(workoutMeasureType == "Workout Time") {
-        request = {
-          method: "post",
-          headers: {
-            "Content-Type":"application/json"
-          },
-          body: JSON.stringify({
-            workoutSetName: setName,
-            workoutName: workoutName,
-            workoutTime: workoutMeasure
-          })
-        };
-      }
+    let request = {
+        method: "post",
+        headers: {
+          "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+          workoutSetName: newSetName
+        })
+      };
   
-      fetch('/new_workout', request).then(response => console.log(response));
-}
-
-/*** ON SELECT ***/
-export function onSelectNewWorkoutDropdown(e, setNewWorkoutDropDownTitle, setDisableNewWorkoutMeasure, setNewWorkoutUnits) {
-    setNewWorkoutDropDownTitle(e);
-    setDisableNewWorkoutMeasure(false);
-
-    if(e == "Number of Reps") {
-        setNewWorkoutUnits("reps");
-    }
-    else if(e == "Workout Time") {
-        setNewWorkoutUnits("seconds");
-    }
+    fetch('/new_set', request).then(response => console.log(response));
 }
 
 /*** RERENDER ***/
-function rerenderAfterAddingNewWorkout(allData, setName, workoutName, workoutMeasureType, workoutMeasure, setAllData) {
+function rerenderAfterAddingNewSet(allData, allSets, newSetName, setAllSets, setAllData) {
+    let updatedSets = [...allSets];
+    updatedSets.push(newSetName);
+    setAllSets(updatedSets);
+
     let updatedData = {...allData};
-    if(workoutMeasureType == "Number of Reps") {
-        updatedData[setName].push({ workoutName: workoutName, workoutReps: workoutMeasure });
-    }
-    else if(workoutMeasureType == "Workout Time") {
-        updatedData[setName].push({ workoutName: workoutName, workoutTime: workoutMeasure });
-    }
+    updatedData[newSetName] = [];
     setAllData(updatedData);
 }
