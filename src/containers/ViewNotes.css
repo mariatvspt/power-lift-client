@@ -1,6 +1,7 @@
 .ViewNotes {
     font-size: 15px;
     color: black !important;
+    margin-bottom: 100px;
 }
 
 .WorkoutHeader {
@@ -111,4 +112,22 @@
 
 .EditSetForm {
     background-color: #f8f9fa;
+}
+
+.NewSetButton {
+    background-color: white !important;
+    border-color: black !important;
+}
+
+.NewSetButton:hover {
+    background: #f8f9fa !important;
+}
+
+.NewWorkoutButton {
+    background-color: white !important;
+    border-color: black !important;
+}
+
+.NewWorkoutButton:hover {
+    background: #f8f9fa !important;
 }

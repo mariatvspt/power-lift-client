@@ -25,6 +25,29 @@ export function workoutMeasureFields(e, setEditWorkoutDropDownTitle, setWorkoutM
     setUpdatedWorkoutMeasureType(e);
 }
 
+/*** ON CHANGE ***/
+export function onChangeEditWorkoutName(e, setUpdatedWorkoutName, setEmptyEditWorkoutNameError) {
+    setUpdatedWorkoutName(e.target.value);
+
+    if(e.target.value.length == 0) {
+        setEmptyEditWorkoutNameError(true);
+    }
+    else {
+        setEmptyEditWorkoutNameError(false);
+    }
+}
+
+export function onChangeEditWorkoutMeasure(e, setUpdatedWorkoutMeasure, setEmptyEditWorkoutMeasureError) {
+    setUpdatedWorkoutMeasure(e.target.value);
+
+    if(e.target.value.length == 0) {
+        setEmptyEditWorkoutMeasureError(true);
+    }
+    else {
+        setEmptyEditWorkoutMeasureError(false);
+    }
+}
+
 /*** ON CLICK ***/
 
 // "Edit workout" button is clicked

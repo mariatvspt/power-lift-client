@@ -51,7 +51,7 @@ export function onClickDeleteSetButton(allData, workoutSetName, setShowDeleteSet
 /*** ON SELECT ***/
 
 // When user select a workout set tab
-export function onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setSetSelected, setShowEditSetFields) {
+export function onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setSetSelected, setShowEditSetFields, setShowNewWorkoutFields) {
     setKey(allSets[e]);
     setSetSelected(true);
 
@@ -66,6 +66,8 @@ export function onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, set
     if(showEditSetFields!= -1 && e!=showEditSetFields) {
         setShowEditSetFields(-1);
     }
+
+    setShowNewWorkoutFields(false);
 }
 
 /*** CONFIRM ***/
