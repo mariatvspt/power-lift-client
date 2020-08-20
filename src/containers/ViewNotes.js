@@ -1,10 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Overlay, Tooltip, Modal, DropdownButton, Form, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem, NavLink } from "react-bootstrap";
+import { Modal, DropdownButton, Form, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem, NavLink } from "react-bootstrap";
 import { MDBIcon } from 'mdbreact';
 import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
 import { confirmEditWorkout, confirmDeleteWorkout, onChangeEditWorkoutName, onChangeEditWorkoutMeasure, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, workoutMeasureFields } from "../controllers/DisplayWorkoutsController.js"
 import { onChangeNewWorkoutName, onChangeNewWorkoutMeasure, onClickNewWorkoutDoneButton, onSelectNewWorkoutDropdown } from "../controllers/AddNewWorkoutController.js";
 import { onChangeNewSetName, onClickNewSetDoneButton } from "../controllers/AddNewSetController.js";
+import ErrorTooltip from "../components/ErrorTooltip.js";
 import "./ViewNotes.css"
 
 export default function ViewNotes() {
@@ -76,43 +77,6 @@ export default function ViewNotes() {
         }
         fetchSets();
     }, []);
-
-    /*** DISPLAY TOOLTIP ***/
-
-    function displaySetNameTooltip(overlayTarget, emptyError, duplicateError) {
-        return (
-            <>
-                <Overlay target={overlayTarget.current} show={emptyError} placement="left">
-                    {(props) => (
-                    <Tooltip id="overlay-example" {...props}>
-                        Please enter a non-empty set name.
-                    </Tooltip>
-                    )}
-                </Overlay>
-                <Overlay target={overlayTarget.current} show={duplicateError} placement="left">
-                    {(props) => (
-                    <Tooltip id="overlay-example" {...props}>
-                        Please enter a non-existing set name.
-                    </Tooltip>
-                    )}
-                </Overlay>
-            </>
-        );
-    }
-
-    function displayWorkoutTooltip(overlayTarget, emptyError) {
-        return (
-            <>
-                <Overlay target={overlayTarget.current} show={emptyError} placement="right">
-                    {(props) => (
-                    <Tooltip id="overlay-example" {...props}>
-                        This field cannot be empty.
-                    </Tooltip>
-                    )}
-                </Overlay>
-            </>
-        );
-    }
 
     /*** DISPLAY MODALS ***/
 
@@ -196,7 +160,8 @@ export default function ViewNotes() {
                     defaultValue={workoutSetName}
                     key={"EditSetForm"+i}
                     onChange={e => onChangeEditWorkoutSetName(e, allSets, i, setUpdatedWorkoutSetName, setEmptySetNameError, setDuplicateSetNameError)}/>
-                {displaySetNameTooltip(setNameOverlayTarget, emptySetNameError, duplicateSetNameError)}
+                <ErrorTooltip target={setNameOverlayTarget.current} show={emptySetNameError} placement="left" type="empty"></ErrorTooltip>
+                <ErrorTooltip target={setNameOverlayTarget.current} show={duplicateSetNameError} placement="left" type="duplicate"></ErrorTooltip>
                 <Button
                     disabled={emptySetNameError || duplicateSetNameError}
                     className="EditSetButtons"
@@ -292,7 +257,7 @@ export default function ViewNotes() {
                         defaultValue={workoutName}
                         key={"EditWorkoutForm"+i}
                         onChange={e => onChangeEditWorkoutName(e, setUpdatedWorkoutName, setEmptyEditWorkoutNameError)}/>
-                    {displayWorkoutTooltip(editSetNameOverlayTarget, emptyEditWorkoutNameError)}
+                    <ErrorTooltip target={editSetNameOverlayTarget.current} show={emptyEditWorkoutNameError} placement="right" type="empty"></ErrorTooltip>
                 </Card.Header>
                 <Card.Body key={"CardBodyKey"+i}>
                     <DropdownButton
@@ -318,7 +283,7 @@ export default function ViewNotes() {
                         defaultValue={workoutMeasure}
                         key={"EditWorkoutMeasure"+i}
                         onChange={e => onChangeEditWorkoutMeasure(e, setUpdatedWorkoutMeasure, setEmptyEditWorkoutMeasureError)}/>
-                        {displayWorkoutTooltip(editSetMeasureOverlayTarget, emptyEditWorkoutMeasureError)}
+                        <ErrorTooltip target={editSetMeasureOverlayTarget.current} show={emptyEditWorkoutMeasureError} placement="right" type="empty"></ErrorTooltip>
                         <p>{editWorkoutUnits}</p>
                         <Button
                             disabled={emptyEditWorkoutNameError || emptyEditWorkoutMeasureError}
