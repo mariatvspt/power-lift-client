@@ -1,13 +1,17 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Modal, DropdownButton, Form, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem, NavLink } from "react-bootstrap";
 import { MDBIcon } from 'mdbreact';
+// controllers
 import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
 import { cancelEditWorkout, confirmEditWorkout, confirmDeleteWorkout, onChangeEditWorkoutName, onChangeEditWorkoutMeasure, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, workoutMeasureFields } from "../controllers/DisplayWorkoutsController.js"
 import { onChangeNewWorkoutName, onChangeNewWorkoutMeasure, onClickNewWorkoutDoneButton, onSelectNewWorkoutDropdown } from "../controllers/AddNewWorkoutController.js";
 import { onChangeNewSetName, onClickNewSetDoneButton } from "../controllers/AddNewSetController.js";
+// components
 import ErrorTooltip from "../components/ErrorTooltip.js"; // to be removed?
 import WorkoutHeader from "../components/WorkoutHeader.js";
 import WorkoutBody from "../components/WorkoutBody.js";
+import SetTab from "../components/SetTab.js";
+
 import "./ViewNotes.css"
 
 export default function ViewNotes() {
@@ -154,51 +158,29 @@ export default function ViewNotes() {
 
     function displayEditSetFields(workoutSetName, i) {
         return (
-            <Form className="form-inline EditSetForm">
-                <Form.Control
-                    ref={setNameOverlayTarget}
-                    className="EditSetFormControl"
-                    placeholder="Edit Set Name"
-                    defaultValue={workoutSetName}
-                    key={"EditSetForm"+i}
-                    onChange={e => onChangeEditWorkoutSetName(e, allSets, i, setUpdatedWorkoutSetName, setEmptySetNameError, setDuplicateSetNameError)}/>
-                <ErrorTooltip target={setNameOverlayTarget.current} show={emptySetNameError} placement="left" type="empty"/>
-                <ErrorTooltip target={setNameOverlayTarget.current} show={duplicateSetNameError} placement="left" type="duplicate"/>
-                <Button
-                    disabled={emptySetNameError || duplicateSetNameError}
-                    className="EditSetButtons"
-                    variant="info"
-                    key={"ConfirmEditSetButton"+i}
-                    onClick={e => confirmEditWorkoutSet(allData, allSets, updatedWorkoutSetName, i, setShowEditSetFields, setAllSets, setAllData, setKey)}>
-                    <MDBIcon icon="check"/>
-                </Button>
-                <Button className="EditSetButtons" variant="danger" key={"CancelEditSetButton"+i} onClick={e => setShowEditSetFields(-1)}>
-                    <MDBIcon icon="times"/>
-                </Button>
-            </Form>
+            <SetTab
+                workoutSetName={workoutSetName}
+                index={i}
+                type="edit"
+                onChangeEditWorkoutSetName={e => onChangeEditWorkoutSetName(e, allSets, i, setUpdatedWorkoutSetName, setEmptySetNameError, setDuplicateSetNameError)}
+                confirmEditWorkoutSet={e => confirmEditWorkoutSet(allData, allSets, updatedWorkoutSetName, i, setShowEditSetFields, setAllSets, setAllData, setKey)}
+                setShowEditSetFields={e => setShowEditSetFields(-1)}
+                setNameOverlayTarget={setNameOverlayTarget}
+                emptySetNameError={emptySetNameError}
+                duplicateSetNameError={duplicateSetNameError}
+            />
         );
     }
 
     function displayEachSet(workoutSetName, i) {
         return (
-            <NavLink
-                className="SetTab"
-                onSelect={e => onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setSetSelected, setShowEditSetFields, setShowNewWorkoutFields)}
-                key={"set"+i}
-                id={i}
-                eventKey={i}>
-                {workoutSetName}   
-                <Button className="ModifySetButton" variant="outline-dark" key={"DeleteSetButton"+i} onClick={e => onClickDeleteSetButton(allData, workoutSetName, setShowDeleteSetModal, setDeletedSet, setDeletedSetLength)}>
-                    <MDBIcon icon="trash"/>
-                </Button>
-                <Button
-                    className="ModifySetButton"
-                    variant="outline-dark"
-                    key={"EditSetButton"+i}
-                    onClick={e => onClickEditSetButton(workoutSetName, i, setShowEditSetFields, setUpdatedWorkoutSetName)}>
-                    <MDBIcon icon="edit"/>
-                </Button>
-            </NavLink>
+            <SetTab
+                workoutSetName={workoutSetName}
+                index={i}
+                onSelectWorkoutSetTab={e => onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setSetSelected, setShowEditSetFields, setShowNewWorkoutFields)}
+                onClickDeleteSetButton={e => onClickDeleteSetButton(allData, workoutSetName, setShowDeleteSetModal, setDeletedSet, setDeletedSetLength)}
+                onClickEditSetButton={e => onClickEditSetButton(workoutSetName, i, setShowEditSetFields, setUpdatedWorkoutSetName)}
+            />
         );
     }
 

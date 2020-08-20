@@ -7,10 +7,10 @@ export default function WorkoutHeader({
     workoutName,
     index,
     type="display",
-    // display workout header
+    // display workout header (events)
     onClickDeleteWorkoutButton,
     onClickEditWorkoutButton,
-    // edit workout header
+    // edit workout header (events)
     onChangeEditWorkoutName,
     // tooltip
     editSetNameOverlayTarget,
