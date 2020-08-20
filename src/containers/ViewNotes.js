@@ -363,7 +363,8 @@ export default function ViewNotes() {
                         className="EditSetFormControl"
                         placeholder="New Set Name"
                         onChange={e => onChangeNewSetName(e, allSets, setNewSetName, setEmptyNewSetNameError, setDuplicateNewSetNameError)}/>
-                    {displaySetNameTooltip(newSetNameOverlayTarget, emptyNewSetNameError, duplicateNewSetNameError)}
+                    <ErrorTooltip target={newSetNameOverlayTarget.current} show={emptyNewSetNameError} placement="left" type="empty"></ErrorTooltip>
+                    <ErrorTooltip target={newSetNameOverlayTarget.current} show={duplicateNewSetNameError} placement="left" type="duplicate"></ErrorTooltip>
                     <Button
                         disabled={emptyNewSetNameError || duplicateNewSetNameError}
                         key="NewSetDoneButton"
