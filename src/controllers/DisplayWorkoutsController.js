@@ -68,6 +68,13 @@ export function onClickDeleteWorkoutButton(workoutSetName, workoutName, workoutM
     setDeletedWorkoutIndex(index);
 }
 
+/*** CANCEL ***/
+export function cancelEditWorkout(setShowEditWorkoutFields, setEmptyEditWorkoutNameError, setEmptyEditWorkoutMeasureError) {
+    setShowEditWorkoutFields(-1);
+    setEmptyEditWorkoutNameError(false);
+    setEmptyEditWorkoutMeasureError(false);
+}
+
 /*** CONFIRM ***/
 
 // Calls edit_workout API when user done editing

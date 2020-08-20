@@ -2,10 +2,12 @@ import React, { useRef, useState, useEffect } from "react";
 import { Modal, DropdownButton, Form, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem, NavLink } from "react-bootstrap";
 import { MDBIcon } from 'mdbreact';
 import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
-import { confirmEditWorkout, confirmDeleteWorkout, onChangeEditWorkoutName, onChangeEditWorkoutMeasure, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, workoutMeasureFields } from "../controllers/DisplayWorkoutsController.js"
+import { cancelEditWorkout, confirmEditWorkout, confirmDeleteWorkout, onChangeEditWorkoutName, onChangeEditWorkoutMeasure, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, workoutMeasureFields } from "../controllers/DisplayWorkoutsController.js"
 import { onChangeNewWorkoutName, onChangeNewWorkoutMeasure, onClickNewWorkoutDoneButton, onSelectNewWorkoutDropdown } from "../controllers/AddNewWorkoutController.js";
 import { onChangeNewSetName, onClickNewSetDoneButton } from "../controllers/AddNewSetController.js";
-import ErrorTooltip from "../components/ErrorTooltip.js";
+import ErrorTooltip from "../components/ErrorTooltip.js"; // to be removed?
+import WorkoutHeader from "../components/WorkoutHeader.js";
+import WorkoutBody from "../components/WorkoutBody.js";
 import "./ViewNotes.css"
 
 export default function ViewNotes() {
@@ -160,8 +162,8 @@ export default function ViewNotes() {
                     defaultValue={workoutSetName}
                     key={"EditSetForm"+i}
                     onChange={e => onChangeEditWorkoutSetName(e, allSets, i, setUpdatedWorkoutSetName, setEmptySetNameError, setDuplicateSetNameError)}/>
-                <ErrorTooltip target={setNameOverlayTarget.current} show={emptySetNameError} placement="left" type="empty"></ErrorTooltip>
-                <ErrorTooltip target={setNameOverlayTarget.current} show={duplicateSetNameError} placement="left" type="duplicate"></ErrorTooltip>
+                <ErrorTooltip target={setNameOverlayTarget.current} show={emptySetNameError} placement="left" type="empty"/>
+                <ErrorTooltip target={setNameOverlayTarget.current} show={duplicateSetNameError} placement="left" type="duplicate"/>
                 <Button
                     disabled={emptySetNameError || duplicateSetNameError}
                     className="EditSetButtons"
@@ -250,58 +252,29 @@ export default function ViewNotes() {
     function displayEditWorkoutFields(set, workoutName, workoutMeasure, i) {
         return (
             <>
-                <Card.Header className="WorkoutHeader" key={"WorkoutCardHeader"+i}>
-                    <Form.Control
-                        ref={editSetNameOverlayTarget}
-                        placeholder="Edit Workout Name"
-                        defaultValue={workoutName}
-                        key={"EditWorkoutForm"+i}
-                        onChange={e => onChangeEditWorkoutName(e, setUpdatedWorkoutName, setEmptyEditWorkoutNameError)}/>
-                    <ErrorTooltip target={editSetNameOverlayTarget.current} show={emptyEditWorkoutNameError} placement="right" type="empty"></ErrorTooltip>
-                </Card.Header>
-                <Card.Body key={"CardBodyKey"+i}>
-                    <DropdownButton
-                        disabled={emptyEditWorkoutNameError}
-                        size="lg"
-                        variant="outline-dark"
-                        onSelect={e => workoutMeasureFields(e, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}
-                        title={editWorkoutDropDownTitle}
-                        key={"WorkoutMeasureTypeDropdown"+i}>
-                        <Dropdown.Item
-                            eventKey="workoutTime">
-                                Workout Time
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                            eventKey="workoutReps">
-                                Number of Reps
-                        </Dropdown.Item>
-                    </DropdownButton>
-                    <Form.Control
-                        ref={editSetMeasureOverlayTarget}
-                        disabled={emptyEditWorkoutNameError}
-                        placeholder={workoutMeasurePlaceholder}
-                        defaultValue={workoutMeasure}
-                        key={"EditWorkoutMeasure"+i}
-                        onChange={e => onChangeEditWorkoutMeasure(e, setUpdatedWorkoutMeasure, setEmptyEditWorkoutMeasureError)}/>
-                        <ErrorTooltip target={editSetMeasureOverlayTarget.current} show={emptyEditWorkoutMeasureError} placement="right" type="empty"></ErrorTooltip>
-                        <p>{editWorkoutUnits}</p>
-                        <Button
-                            disabled={emptyEditWorkoutNameError || emptyEditWorkoutMeasureError}
-                            className="DoneEditWorkoutButton"
-                            variant="secondary"
-                            key={"DoneWorkoutButton"+i}
-                            value={i}
-                            onClick={e => confirmEditWorkout(allData, set, updatedWorkoutName, updatedWorkoutMeasureType, updatedWorkoutMeasure, i, setShowEditWorkoutFields, setAllData)}>
-                            Done
-                        </Button>
-                        <Button
-                            className="CancelEditWorkoutButton"
-                            variant="danger"
-                            key={"CancelWorkoutButton"+i}
-                            onClick={e => setShowEditWorkoutFields(-1) & setEmptyEditWorkoutNameError(false) & setEmptyEditWorkoutMeasureError(false)}>
-                            Cancel
-                        </Button>
-                </Card.Body>
+                <WorkoutHeader
+                    workoutName={workoutName}
+                    index={i}
+                    type="edit"
+                    onChangeEditWorkoutName={e => onChangeEditWorkoutName(e, setUpdatedWorkoutName, setEmptyEditWorkoutNameError)}
+                    editSetNameOverlayTarget={editSetNameOverlayTarget}
+                    emptyEditWorkoutNameError={emptyEditWorkoutNameError}
+                />
+                <WorkoutBody
+                    workoutMeasure={workoutMeasure}
+                    index={i}
+                    type="edit"
+                    emptyEditWorkoutNameError={emptyEditWorkoutNameError}
+                    emptyEditWorkoutMeasureError={emptyEditWorkoutMeasureError}
+                    editWorkoutDropDownTitle={editWorkoutDropDownTitle}
+                    editWorkoutUnits={editWorkoutUnits}
+                    workoutMeasurePlaceholder={workoutMeasurePlaceholder}
+                    editSetMeasureOverlayTarget={editSetMeasureOverlayTarget}
+                    onChangeEditWorkoutMeasure={e => onChangeEditWorkoutMeasure(e, setUpdatedWorkoutMeasure, setEmptyEditWorkoutMeasureError)}
+                    workoutMeasureFields={e => workoutMeasureFields(e, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}
+                    confirmEditWorkout={e => confirmEditWorkout(allData, set, updatedWorkoutName, updatedWorkoutMeasureType, updatedWorkoutMeasure, i, setShowEditWorkoutFields, setAllData)}
+                    cancelEditWorkout={e => cancelEditWorkout(setShowEditWorkoutFields, setEmptyEditWorkoutNameError, setEmptyEditWorkoutMeasureError)}
+                />
             </>
         );
     }
@@ -309,39 +282,17 @@ export default function ViewNotes() {
     function displayEachWorkout(set, workoutName, measureType, workoutMeasure, i) {
         return (
             <>
-                <Card.Header className="WorkoutHeader" key={"CardHeaderKey"+i}>
-                    {workoutName}
-                    <Button
-                        className="ModifyWorkoutButton"
-                        variant="danger"
-                        key={"DeleteWorkoutButton"+i}
-                        onClick={e => onClickDeleteWorkoutButton(set, workoutName, measureType, workoutMeasure, i, setShowDeleteWorkoutModal, setDeletedWorkoutSetName, setDeletedWorkoutName, setDeletedWorkoutMeasureType, setDeletedWorkoutMeasure, setDeletedWorkoutIndex)}>
-                        Delete Workout
-                        <MDBIcon icon="trash" className="ml-2"/>
-                    </Button>
-                    <Button
-                        className="ModifyWorkoutButton"
-                        variant="primary"
-                        key={"EditWorkoutButton"+i}
-                        onClick={e => onClickEditWorkoutButton(measureType, workoutName, workoutMeasure, i, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, workoutMeasureFields, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}>
-                        Edit Workout
-                        <MDBIcon icon="edit" className="ml-2"/>
-                    </Button>
-                </Card.Header>
-                <Card.Body key={"CardBodyKey"+i}>
-                    {(measureType == "workoutTime") &&
-                        <>
-                            <Card.Title key={"WorkoutCardTitle"+i}> Workout Time: </Card.Title>
-                            <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure + " seconds"} </Card.Text>
-                        </>
-                    }
-                    {(measureType == "workoutReps") &&
-                        <>
-                            <Card.Title key={"WorkoutCardTitle"+i}> Number of Reps: </Card.Title>
-                            <Card.Text key={"WorkoutMeasure"+i}> {workoutMeasure + " reps"} </Card.Text>
-                        </>
-                    }
-                </Card.Body>
+                <WorkoutHeader
+                    workoutName={workoutName}
+                    index={i}
+                    onClickDeleteWorkoutButton={e => onClickDeleteWorkoutButton(set, workoutName, measureType, workoutMeasure, i, setShowDeleteWorkoutModal, setDeletedWorkoutSetName, setDeletedWorkoutName, setDeletedWorkoutMeasureType, setDeletedWorkoutMeasure, setDeletedWorkoutIndex)}
+                    onClickEditWorkoutButton={e => onClickEditWorkoutButton(measureType, workoutName, workoutMeasure, i, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, workoutMeasureFields, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}
+                />
+                <WorkoutBody
+                    measureType={measureType}
+                    workoutMeasure={workoutMeasure}
+                    index={i}
+                />
             </>
         );
     }
@@ -363,8 +314,8 @@ export default function ViewNotes() {
                         className="EditSetFormControl"
                         placeholder="New Set Name"
                         onChange={e => onChangeNewSetName(e, allSets, setNewSetName, setEmptyNewSetNameError, setDuplicateNewSetNameError)}/>
-                    <ErrorTooltip target={newSetNameOverlayTarget.current} show={emptyNewSetNameError} placement="left" type="empty"></ErrorTooltip>
-                    <ErrorTooltip target={newSetNameOverlayTarget.current} show={duplicateNewSetNameError} placement="left" type="duplicate"></ErrorTooltip>
+                    <ErrorTooltip target={newSetNameOverlayTarget.current} show={emptyNewSetNameError} placement="left" type="empty"/>
+                    <ErrorTooltip target={newSetNameOverlayTarget.current} show={duplicateNewSetNameError} placement="left" type="duplicate"/>
                     <Button
                         disabled={emptyNewSetNameError || duplicateNewSetNameError}
                         key="NewSetDoneButton"
