@@ -11,6 +11,7 @@ import ErrorTooltip from "../components/ErrorTooltip.js"; // to be removed?
 import WorkoutHeader from "../components/WorkoutHeader.js";
 import WorkoutBody from "../components/WorkoutBody.js";
 import SetTab from "../components/SetTab.js";
+import AddButton from "../components/AddButton.js";
 
 import "./ViewNotes.css"
 
@@ -284,10 +285,7 @@ export default function ViewNotes() {
     function addNewSet() {
         return (
             <>
-                <Button key="NewSetButton" className="NewSetButton" size="lg" block variant="light" onClick={e => setShowNewSetFields(!showNewSetFields)}>
-                    <MDBIcon key="NewWorkoutButtonIcon" icon="plus"/>
-                    {'\t'} Add New Set
-                </Button>
+                <AddButton type="Set" setShowNewFields={e => setShowNewSetFields(!showNewSetFields)}/>
                 { showNewSetFields &&
                     <Form className="form-inline EditSetForm">
                     <Form.Control
@@ -318,10 +316,7 @@ export default function ViewNotes() {
     function addNewWorkout(set) {
         return (
             <>
-                <Button key="NewWorkoutButton" className ="NewWorkoutButton" size="lg" block variant="light" onClick={e => setShowNewWorkoutFields(!showNewWorkoutFields)}>
-                    <MDBIcon key="NewWorkoutButtonIcon" icon="plus"/>
-                    {'\t'} Add New Workout
-                </Button>
+                <AddButton type="Workout" setShowNewFields={e => setShowNewWorkoutFields(!showNewWorkoutFields)}/>
                 { showNewWorkoutFields &&
                     <Card key="NewWorkoutCard">
                         <Card.Header key="NewWorkoutCardHeader" className="NewWorkoutHeader">
