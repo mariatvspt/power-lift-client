@@ -26,7 +26,7 @@ export default function WorkoutHeader({
               key={"DeleteWorkoutButton"+index}
               onClick={onClickDeleteWorkoutButton}>
               Delete Workout
-              <MDBIcon icon="trash" className="ml-2"/>
+              <MDBIcon key={"DeleteWorkoutIcon"+index} icon="trash" className="ml-2"/>
             </Button>
             <Button
                 className="ModifyWorkoutButton"
@@ -34,7 +34,7 @@ export default function WorkoutHeader({
                 key={"EditWorkoutButton"+index}
                 onClick={onClickEditWorkoutButton}>
                 Edit Workout
-                <MDBIcon icon="edit" className="ml-2"/>
+                <MDBIcon key={"EditWorkoutIcon"+index} icon="edit" className="ml-2"/>
             </Button>
           </>
         }
@@ -45,7 +45,12 @@ export default function WorkoutHeader({
               defaultValue={workoutName}
               key={"EditWorkoutForm"+index}
               onChange={onChangeEditWorkoutName}/>
-            <ErrorTooltip target={editSetNameOverlayTarget.current} show={emptyEditWorkoutNameError} placement="right" type="empty"/>
+            <ErrorTooltip
+              key={"WorkoutHeaderTooltip"+index}
+              target={editSetNameOverlayTarget.current}
+              show={emptyEditWorkoutNameError}
+              placement="right"
+              type="empty"/>
           </>
         }
     </Card.Header>

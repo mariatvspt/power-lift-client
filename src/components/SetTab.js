@@ -35,33 +35,35 @@ export default function SetTab({
                     variant="outline-dark"
                     key={"DeleteSetButton"+index}
                     onClick={onClickDeleteSetButton}>
-                    <MDBIcon icon="trash"/>
+                    <MDBIcon key={"DeleteSetIcon"+index} icon="trash"/>
                 </Button>
                 <Button
                     className="ModifySetButton"
                     variant="outline-dark"
                     key={"EditSetButton"+index}
                     onClick={onClickEditSetButton}>
-                    <MDBIcon icon="edit"/>
+                    <MDBIcon key={"EditSetIcon"+index} icon="edit"/>
                 </Button>
             </NavLink>
         }
         {
             type == "edit" &&
-            <Form className="form-inline EditSetForm">
+            <Form key={"SetForm"+index} className="form-inline EditSetForm">
                 <Form.Control
                     ref={setNameOverlayTarget}
                     className="EditSetFormControl"
                     placeholder="Edit Set Name"
                     defaultValue={workoutSetName}
-                    key={"EditSetForm"+index}
+                    key={"SetFormControl"+index}
                     onChange={onChangeEditWorkoutSetName}/>
                 <ErrorTooltip
+                    key={"EmptySetNameTooltip"+index}
                     target={setNameOverlayTarget.current}
                     show={emptySetNameError}
                     placement="left"
                     type="empty"/>
                 <ErrorTooltip
+                    key={"DuplicateSetNameTooltip"+index}
                     target={setNameOverlayTarget.current}
                     show={duplicateSetNameError}
                     placement="left"
@@ -72,14 +74,14 @@ export default function SetTab({
                     variant="info"
                     key={"ConfirmEditSetButton"+index}
                     onClick={confirmEditWorkoutSet}>
-                    <MDBIcon icon="check"/>
+                    <MDBIcon key={"ConfirmEditSetIcon"+index} icon="check"/>
                 </Button>
                 <Button
                     className="EditSetButtons"
                     variant="danger"
                     key={"CancelEditSetButton"+index}
                     onClick={setShowEditSetFields}>
-                    <MDBIcon icon="times"/>
+                    <MDBIcon key={"CancelEditSetIcon"+index} icon="times"/>
                 </Button>
             </Form>
         }

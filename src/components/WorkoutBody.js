@@ -50,10 +50,12 @@ export default function WorkoutBody({
                     title={editWorkoutDropDownTitle}
                     key={"WorkoutMeasureTypeDropdown"+index}>
                     <Dropdown.Item
+                        key={"WorkoutTimeDropdownItem"+index}
                         eventKey="workoutTime">
                             Workout Time
                     </Dropdown.Item>
                     <Dropdown.Item
+                        key={"WorkoutRepsDropdownItem"+index}
                         eventKey="workoutReps">
                             Number of Reps
                     </Dropdown.Item>
@@ -65,7 +67,12 @@ export default function WorkoutBody({
                     defaultValue={workoutMeasure}
                     key={"EditWorkoutMeasure"+index}
                     onChange={onChangeEditWorkoutMeasure}/>
-                <ErrorTooltip target={editSetMeasureOverlayTarget.current} show={emptyEditWorkoutMeasureError} placement="right" type="empty"/>
+                <ErrorTooltip
+                    target={editSetMeasureOverlayTarget.current}
+                    show={emptyEditWorkoutMeasureError}
+                    placement="right"
+                    type="empty"
+                    key={"WorkoutBodyTooltip"+index}/>
                 <p>{editWorkoutUnits}</p>
                 <Button
                     disabled={emptyEditWorkoutNameError || emptyEditWorkoutMeasureError}

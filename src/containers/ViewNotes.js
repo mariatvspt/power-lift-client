@@ -168,8 +168,7 @@ export default function ViewNotes() {
                 setShowEditSetFields={e => setShowEditSetFields(-1)}
                 setNameOverlayTarget={setNameOverlayTarget}
                 emptySetNameError={emptySetNameError}
-                duplicateSetNameError={duplicateSetNameError}
-            />
+                duplicateSetNameError={duplicateSetNameError}/>
         );
     }
 
@@ -180,8 +179,7 @@ export default function ViewNotes() {
                 index={i}
                 onSelectWorkoutSetTab={e => onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setSetSelected, setShowEditSetFields, setShowNewWorkoutFields)}
                 onClickDeleteSetButton={e => onClickDeleteSetButton(allData, workoutSetName, setShowDeleteSetModal, setDeletedSet, setDeletedSetLength)}
-                onClickEditSetButton={e => onClickEditSetButton(workoutSetName, i, setShowEditSetFields, setUpdatedWorkoutSetName)}
-            />
+                onClickEditSetButton={e => onClickEditSetButton(workoutSetName, i, setShowEditSetFields, setUpdatedWorkoutSetName)}/>
         );
     }
 
@@ -241,8 +239,7 @@ export default function ViewNotes() {
                     type="edit"
                     onChangeEditWorkoutName={e => onChangeEditWorkoutName(e, setUpdatedWorkoutName, setEmptyEditWorkoutNameError)}
                     editSetNameOverlayTarget={editSetNameOverlayTarget}
-                    emptyEditWorkoutNameError={emptyEditWorkoutNameError}
-                />
+                    emptyEditWorkoutNameError={emptyEditWorkoutNameError}/>
                 <WorkoutBody
                     workoutMeasure={workoutMeasure}
                     index={i}
@@ -256,8 +253,7 @@ export default function ViewNotes() {
                     onChangeEditWorkoutMeasure={e => onChangeEditWorkoutMeasure(e, setUpdatedWorkoutMeasure, setEmptyEditWorkoutMeasureError)}
                     workoutMeasureFields={e => workoutMeasureFields(e, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}
                     confirmEditWorkout={e => confirmEditWorkout(allData, set, updatedWorkoutName, updatedWorkoutMeasureType, updatedWorkoutMeasure, i, setShowEditWorkoutFields, setAllData)}
-                    cancelEditWorkout={e => cancelEditWorkout(setShowEditWorkoutFields, setEmptyEditWorkoutNameError, setEmptyEditWorkoutMeasureError)}
-                />
+                    cancelEditWorkout={e => cancelEditWorkout(setShowEditWorkoutFields, setEmptyEditWorkoutNameError, setEmptyEditWorkoutMeasureError)}/>
             </>
         );
     }
@@ -269,13 +265,11 @@ export default function ViewNotes() {
                     workoutName={workoutName}
                     index={i}
                     onClickDeleteWorkoutButton={e => onClickDeleteWorkoutButton(set, workoutName, measureType, workoutMeasure, i, setShowDeleteWorkoutModal, setDeletedWorkoutSetName, setDeletedWorkoutName, setDeletedWorkoutMeasureType, setDeletedWorkoutMeasure, setDeletedWorkoutIndex)}
-                    onClickEditWorkoutButton={e => onClickEditWorkoutButton(measureType, workoutName, workoutMeasure, i, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, workoutMeasureFields, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}
-                />
+                    onClickEditWorkoutButton={e => onClickEditWorkoutButton(measureType, workoutName, workoutMeasure, i, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, workoutMeasureFields, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}/>
                 <WorkoutBody
                     measureType={measureType}
                     workoutMeasure={workoutMeasure}
-                    index={i}
-                />
+                    index={i}/>
             </>
         );
     }
