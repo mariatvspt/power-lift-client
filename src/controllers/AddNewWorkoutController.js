@@ -1,23 +1,23 @@
 /*** ON CHANGE ***/
-export function onChangeNewWorkoutName(e, setNewWorkoutName, setDisableNewWorkoutDropdown) {
+export function onChangeNewWorkoutName(e, setNewWorkoutName, setEmptyNewWorkoutNameError) {
     setNewWorkoutName(e.target.value);
     
-    if(e.target.value.length > 0) {
-        setDisableNewWorkoutDropdown(false);
+    if(e.target.value.length == 0) {
+      setEmptyNewWorkoutNameError(true);
     }        
     else {
-        setDisableNewWorkoutDropdown(true);
+      setEmptyNewWorkoutNameError(false);
     }
 }
 
-export function onChangeNewWorkoutMeasure(e, setNewWorkoutMeasure, setDisableNewWorkoutDoneButton) {
+export function onChangeNewWorkoutMeasure(e, setNewWorkoutMeasure, setEmptyNewWorkoutMeasureError) {
     setNewWorkoutMeasure(e.target.value);
 
-    if(e.target.value.length > 0) {
-        setDisableNewWorkoutDoneButton(false);
+    if(e.target.value.length == 0) {
+      setEmptyNewWorkoutMeasureError(true);
     }
     else {
-        setDisableNewWorkoutDoneButton(true);
+      setEmptyNewWorkoutMeasureError(false);
     }
 }
 
@@ -58,15 +58,21 @@ export function onClickNewWorkoutDoneButton(allData, setName, workoutName, worko
 }
 
 /*** ON SELECT ***/
-export function onSelectNewWorkoutDropdown(e, setNewWorkoutDropDownTitle, setDisableNewWorkoutMeasure, setNewWorkoutUnits) {
-    setNewWorkoutDropDownTitle(e);
-    setDisableNewWorkoutMeasure(false);
+export function onSelectNewWorkoutDropdown(e, emptyNewWorkoutMeasureTypeError, setNewWorkoutMeasureType, setEmptyNewWorkoutMeasureTypeError, setNewWorkoutUnits, setNewWorkoutMeasurePlaceholder, setEmptyNewWorkoutMeasureError) {
+    if(emptyNewWorkoutMeasureTypeError) {
+      setEmptyNewWorkoutMeasureError(true);
+      setEmptyNewWorkoutMeasureTypeError(false);
+    }    
 
-    if(e == "Number of Reps") {
-        setNewWorkoutUnits("reps");
+    if(e == "workoutTime") {
+      setNewWorkoutMeasureType("Workout Time");
+      setNewWorkoutMeasurePlaceholder("Enter workout time");
+      setNewWorkoutUnits("seconds");
     }
-    else if(e == "Workout Time") {
-        setNewWorkoutUnits("seconds");
+    else if(e == "workoutReps") {
+      setNewWorkoutMeasureType("Number of Reps");
+      setNewWorkoutMeasurePlaceholder("Enter number of reps");
+      setNewWorkoutUnits("reps")
     }
 }
 

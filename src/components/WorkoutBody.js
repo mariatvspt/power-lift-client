@@ -9,16 +9,18 @@ export default function WorkoutBody({
     // display workout body
     measureType,
     // edit workout body
-    emptyEditWorkoutNameError,
-    emptyEditWorkoutMeasureError,
-    editWorkoutDropDownTitle,
-    editWorkoutUnits,
+    emptyWorkoutNameError,
+    emptyWorkoutMeasureError,
+    workoutDropDownTitle,
+    workoutUnits,
     workoutMeasurePlaceholder,
+    // new workout body
+    emptyWorkoutMeasureTypeError,
     // tooltip
-    editSetMeasureOverlayTarget,
+    workoutMeasureOverlayTarget,
     // events
+    onSelectWorkoutMeasureType,
     onChangeEditWorkoutMeasure,
-    workoutMeasureFields,
     confirmEditWorkout,
     cancelEditWorkout
 
@@ -41,13 +43,13 @@ export default function WorkoutBody({
             </>
         }
         {
-            type == "edit" && <>
+            (type == "edit" || type == "new") && <>
                 <DropdownButton
-                    disabled={emptyEditWorkoutNameError}
+                    disabled={emptyWorkoutNameError}
                     size="lg"
                     variant="outline-dark"
-                    onSelect={workoutMeasureFields}
-                    title={editWorkoutDropDownTitle}
+                    onSelect={onSelectWorkoutMeasureType}
+                    title={workoutDropDownTitle}
                     key={"WorkoutMeasureTypeDropdown"+index}>
                     <Dropdown.Item
                         key={"WorkoutTimeDropdownItem"+index}
@@ -61,21 +63,21 @@ export default function WorkoutBody({
                     </Dropdown.Item>
                 </DropdownButton>
                 <Form.Control
-                    ref={editSetMeasureOverlayTarget}
-                    disabled={emptyEditWorkoutNameError}
+                    ref={workoutMeasureOverlayTarget}
+                    disabled={emptyWorkoutNameError || emptyWorkoutMeasureTypeError}
                     placeholder={workoutMeasurePlaceholder}
                     defaultValue={workoutMeasure}
                     key={"EditWorkoutMeasure"+index}
                     onChange={onChangeEditWorkoutMeasure}/>
                 <ErrorTooltip
-                    target={editSetMeasureOverlayTarget}
-                    show={emptyEditWorkoutMeasureError}
+                    target={workoutMeasureOverlayTarget}
+                    show={emptyWorkoutMeasureError}
                     placement="right"
                     type="empty"
                     key={"WorkoutBodyTooltip"+index}/>
-                <p>{editWorkoutUnits}</p>
+                <p>{workoutUnits}</p>
                 <Button
-                    disabled={emptyEditWorkoutNameError || emptyEditWorkoutMeasureError}
+                    disabled={emptyWorkoutNameError || emptyWorkoutMeasureTypeError || emptyWorkoutMeasureError}
                     className="DoneEditWorkoutButton"
                     variant="secondary"
                     key={"DoneWorkoutButton"+index}

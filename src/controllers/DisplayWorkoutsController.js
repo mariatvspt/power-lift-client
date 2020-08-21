@@ -11,7 +11,7 @@ export function includes(target, array) {
 }
 
  // Set state of the workout measure fields
-export function workoutMeasureFields(e, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType) {
+export function onSelectWorkoutMeasureType(e, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType) {
     if(e == "workoutTime") {
         setEditWorkoutDropDownTitle("Workout Time");
         setWorkoutMeasurePlaceholder("Edit workout time");
@@ -20,7 +20,7 @@ export function workoutMeasureFields(e, setEditWorkoutDropDownTitle, setWorkoutM
     else if(e == "workoutReps") {
         setEditWorkoutDropDownTitle("Number of Reps");
         setWorkoutMeasurePlaceholder("Edit number of reps");
-        setUnits("reps")
+        setUnits("reps");
     }
     setUpdatedWorkoutMeasureType(e);
 }
@@ -51,11 +51,11 @@ export function onChangeEditWorkoutMeasure(e, setUpdatedWorkoutMeasure, setEmpty
 /*** ON CLICK ***/
 
 // "Edit workout" button is clicked
-export function onClickEditWorkoutButton(workoutMeasureType, workoutName, workoutMeasure, index, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, workoutMeasureFields, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType) {
+export function onClickEditWorkoutButton(workoutMeasureType, workoutName, workoutMeasure, index, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType) {
     setShowEditWorkoutFields(index);
     setUpdatedWorkoutName(workoutName);
     setUpdatedWorkoutMeasure(workoutMeasure);
-    workoutMeasureFields(workoutMeasureType, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType); 
+    onSelectWorkoutMeasureType(workoutMeasureType, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType); 
 }
 
 // "Delete workout" button is clicked

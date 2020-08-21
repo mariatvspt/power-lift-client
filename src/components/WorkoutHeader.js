@@ -11,14 +11,15 @@ export default function WorkoutHeader({
     onClickDeleteWorkoutButton,
     onClickEditWorkoutButton,
     // edit workout header (events)
-    onChangeEditWorkoutName,
+    onChangeWorkoutName,
     // tooltip
-    editSetNameOverlayTarget,
-    emptyEditWorkoutNameError
+    workoutNameOverlayTarget,
+    emptyWorkoutNameError
 }) {
   return (
     <Card.Header className="WorkoutHeader" key={"CardHeaderKey"+index}>
-        { type == "display" && <>
+        { type == "display" &&
+          <>
             {workoutName}
             <Button
               className="ModifyWorkoutButton"
@@ -38,17 +39,18 @@ export default function WorkoutHeader({
             </Button>
           </>
         }
-        { type == "edit" && <>
+        { (type == "edit" || type == "new") &&
+          <>
             <Form.Control
-              ref={editSetNameOverlayTarget}
-              placeholder="Edit Workout Name"
+              ref={workoutNameOverlayTarget}
+              placeholder={type == "edit" ? "Edit Workout Name" : "Enter Workout Name"}
               defaultValue={workoutName}
               key={"EditWorkoutForm"+index}
-              onChange={onChangeEditWorkoutName}/>
+              onChange={onChangeWorkoutName}/>
             <ErrorTooltip
               key={"WorkoutHeaderTooltip"+index}
-              target={editSetNameOverlayTarget}
-              show={emptyEditWorkoutNameError}
+              target={workoutNameOverlayTarget}
+              show={emptyWorkoutNameError}
               placement="right"
               type="empty"/>
           </>

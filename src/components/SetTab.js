@@ -13,7 +13,7 @@ export default function SetTab({
     onClickDeleteSetButton,
     onClickEditSetButton,
     // edit (events)
-    onChangeWorkoutName,
+    onChangeSetName,
     confirmWorkoutSet,
     cancelWorkoutSet,
     // tooltip
@@ -56,7 +56,7 @@ export default function SetTab({
                     placeholder= {type == "edit" ? "Edit Set Name" : "New Set Name"}
                     defaultValue={workoutSetName}
                     key={"SetFormControl"+index}
-                    onChange={onChangeWorkoutName}/>
+                    onChange={onChangeSetName}/>
                 <ErrorTooltip
                     key={"EmptySetNameTooltip"+index}
                     target={setNameOverlayTarget}
