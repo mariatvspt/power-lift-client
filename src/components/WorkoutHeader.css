@@ -1,0 +1,9 @@
+.WorkoutHeader {
+    font-size: larger;
+    font-weight: 500 !important;
+}
+
+.ModifyWorkoutButton {
+    float: right;
+    margin-right: 3px;
+}

@@ -4,108 +4,12 @@
     margin-bottom: 100px;
 }
 
-.WorkoutHeader {
-    font-size: larger;
-    font-weight: 500 !important;
-}
-
 .WorkoutCard {
     margin-bottom: 15px;
-}
-
-.CancelEditWorkoutButton {
-    margin-right: 5px;
-    float: right;
-}
-
-.CancelNewWorkoutButton {
-    margin-right: 5px;
-    float: right;
-}
-
-.DoneEditWorkoutButton {
-    float: right;
-}
-
-.DoneNewWorkoutButton {
-    float: right;
-}
-
-.ModifyWorkoutButton {
-    float: right;
-    margin-right: 3px;
 }
 
 .NoWorkoutToDisplayText {
     font-style: italic;
     text-align: center;
     margin-top: 100px;
-}
-
-.WorkoutNameInModal {
-    font-size: 1.5rem;
-    font-weight: 500 !important;
-}
-
-.SetNameInModal {
-    font-size: 1.5rem;
-    font-weight: 500 !important;
-}
-
-.WorkoutTypeInModal {
-    font-size: 1.25rem;
-    font-weight: 500 !important;
-}
-
-.WorkoutMeasureInModal {
-    font-size: 1.25rem;
-}
-
-.SetLengthInModal {
-    font-size: 1.25rem;
-}
-
-.ModifySetButton {
-    float: right;
-}
-
-.SetTab {
-    color: black;
-}
-
-.SetTab:hover, .SetTab:focus {
-    border-radius: .25rem;
-    outline: 5px auto -webkit-focus-ring-color;
-    outline-offset: -2px;
-    color: black;
-}
-
-.SetTab .ModifySetButton {
-    visibility: hidden;
-}
-
-.SetTab:hover .ModifySetButton {
-    visibility: visible;
-}
-
-.SelectedTab .ModifySetButton {
-    visibility: visible;
-}
-
-.SelectedTab {
-    border-radius: .25rem;
-    outline: 5px auto -webkit-focus-ring-color;
-    outline-offset: -2px;
-    background-color: #f8f9fa;
-    color:black;
-    font-weight: 500;
-}
-
-.EditSetFormControl {
-    height: 100% !important;
-    width: 75% !important;
-}
-
-.EditSetButtons {
-    float: right;
 }

@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Modal, DropdownButton, Form, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem, NavLink } from "react-bootstrap";
-import { MDBIcon } from 'mdbreact';
+import { Modal, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem } from "react-bootstrap";
 // controllers
 import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
 import { cancelEditWorkout, confirmEditWorkout, confirmDeleteWorkout, onChangeEditWorkoutName, onChangeEditWorkoutMeasure, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, onSelectWorkoutMeasureType } from "../controllers/DisplayWorkoutsController.js"
@@ -11,6 +10,7 @@ import WorkoutHeader from "../components/WorkoutHeader.js";
 import WorkoutBody from "../components/WorkoutBody.js";
 import SetTab from "../components/SetTab.js";
 import AddButton from "../components/AddButton.js";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal.js";
 
 import "./ViewNotes.css"
 
@@ -69,6 +69,7 @@ export default function ViewNotes() {
     const [emptyNewWorkoutMeasureTypeError, setEmptyNewWorkoutMeasureTypeError] = useState(true);
     const [emptyNewWorkoutMeasureError, setEmptyNewWorkoutMeasureError] = useState(false);
 
+    // tooltip overlay targets
     const setNameOverlayTarget = useRef(null);
     const newSetNameOverlayTarget = useRef(null);
     const workoutNameOverlayTarget = useRef(null);
@@ -92,48 +93,52 @@ export default function ViewNotes() {
 
     function displayDeleteSetModal() {
         return (
-            <Modal show={showDeleteSetModal} onHide={e => setShowDeleteSetModal(false)} style={{opacity:1}}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Are you sure you want to delete this set? </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p className="SetNameInModal">{deletedSet}</p>
-                    <p className="SetLengthInModal"> Total workouts: {deletedSetLength}</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={e => setShowDeleteSetModal(false)} variant="secondary">Cancel</Button>
-                    <Button onClick={e => confirmDeleteWorkoutSet(allData, deletedSet, setShowDeleteSetModal, setAllData, setAllSets)} variant="danger">Delete</Button>
-                </Modal.Footer>
-            </Modal>
+            <ConfirmDeleteModal
+                type="set"
+                showModal={showDeleteSetModal}
+                hideModal={e => setShowDeleteSetModal(false)}
+                modalTitle={deletedSet}
+                deletedSetLength={deletedSetLength}
+                cancelDelete={e => setShowDeleteSetModal(false)}
+                confirmDelete={e => confirmDeleteWorkoutSet(allData, deletedSet, setShowDeleteSetModal, setAllData, setAllSets)}/>
         );
     }
 
      function displayDeleteWorkoutModal() {
         return (
-            <Modal show={showDeleteWorkoutModal} onHide={e => setShowDeleteWorkoutModal(false)} style={{opacity:1}}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Are you sure you want to delete this workout? </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p className="WorkoutNameInModal">{deletedWorkoutName}</p>
-                    {deletedWorkoutMeasureType == "workoutReps" && 
-                        <>
-                            <p className="WorkoutTypeInModal">Number of Reps:</p>
-                            <p className="WorkoutMeasureInModal">{deletedWorkoutMeasure} reps</p>
-                        </>
-                    }
-                    {deletedWorkoutMeasureType == "workoutTime" &&
-                        <>
-                            <p className="WorkoutTypeInModal">Workout Time:</p>
-                            <p className="WorkoutMeasureInModal">{deletedWorkoutMeasure} seconds</p>
-                        </>
-                    }
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={e => setShowDeleteWorkoutModal(false)} variant="secondary">Cancel</Button>
-                    <Button onClick={e => confirmDeleteWorkout(allData, deletedWorkoutSetName, deletedWorkoutIndex, setShowDeleteWorkoutModal, setAllData)} variant="danger">Delete</Button>
-                </Modal.Footer>
-            </Modal>
+            <ConfirmDeleteModal
+                type="workout"
+                showModal={showDeleteWorkoutModal}
+                hideModal={e => setShowDeleteWorkoutModal(false)}
+                modalTitle={deletedWorkoutName}
+                deletedWorkoutMeasureType={deletedWorkoutMeasureType}
+                deletedWorkoutMeasure={deletedWorkoutMeasure}
+                cancelDelete={e => setShowDeleteWorkoutModal(false)}
+                confirmDelete={e => confirmDeleteWorkout(allData, deletedWorkoutSetName, deletedWorkoutIndex, setShowDeleteWorkoutModal, setAllData)}/>
+            // <Modal show={showDeleteWorkoutModal} onHide={e => setShowDeleteWorkoutModal(false)} style={{opacity:1}}>
+            //     <Modal.Header closeButton>
+            //         <Modal.Title>Are you sure you want to delete this workout?</Modal.Title>
+            //     </Modal.Header>
+            //     <Modal.Body>
+            //         <p className="WorkoutNameInModal">{deletedWorkoutName}</p>
+            //         {deletedWorkoutMeasureType == "workoutReps" && 
+            //             <>
+            //                 <p className="WorkoutTypeInModal">Number of Reps:</p>
+            //                 <p className="WorkoutMeasureInModal">{deletedWorkoutMeasure} reps</p>
+            //             </>
+            //         }
+            //         {deletedWorkoutMeasureType == "workoutTime" &&
+            //             <>
+            //                 <p className="WorkoutTypeInModal">Workout Time:</p>
+            //                 <p className="WorkoutMeasureInModal">{deletedWorkoutMeasure} seconds</p>
+            //             </>
+            //         }
+            //     </Modal.Body>
+            //     <Modal.Footer>
+            //         <Button onClick={e => setShowDeleteWorkoutModal(false)} variant="secondary">Cancel</Button>
+            //         <Button onClick={e => confirmDeleteWorkout(allData, deletedWorkoutSetName, deletedWorkoutIndex, setShowDeleteWorkoutModal, setAllData)} variant="danger">Delete</Button>
+            //     </Modal.Footer>
+            // </Modal>
         );
     }
 
@@ -282,7 +287,7 @@ export default function ViewNotes() {
     function addNewSet() {
         return (
             <>
-                <AddButton type="Set" setShowNewFields={e => setShowNewSetFields(!showNewSetFields)}/>
+                <AddButton type="set" setShowNewFields={e => setShowNewSetFields(!showNewSetFields)}/>
                 { showNewSetFields &&
                     <SetTab
                         type="new"
@@ -300,7 +305,7 @@ export default function ViewNotes() {
     function addNewWorkout(set) {
         return (
             <>
-                <AddButton type="Workout" setShowNewFields={e => setShowNewWorkoutFields(!showNewWorkoutFields)}/>
+                <AddButton type="workout" setShowNewFields={e => setShowNewWorkoutFields(!showNewWorkoutFields)}/>
                 { showNewWorkoutFields &&
                     <Card key="NewWorkoutCard">
                         <WorkoutHeader

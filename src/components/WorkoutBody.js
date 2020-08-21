@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Card, Dropdown, DropdownButton, Form } from "react-bootstrap";
 import ErrorTooltip from "../components/ErrorTooltip.js";
+import "./WorkoutBody.css";
 
 export default function WorkoutBody({
     workoutMeasure,
@@ -78,7 +79,7 @@ export default function WorkoutBody({
                 <p>{workoutUnits}</p>
                 <Button
                     disabled={emptyWorkoutNameError || emptyWorkoutMeasureTypeError || emptyWorkoutMeasureError}
-                    className="DoneEditWorkoutButton"
+                    className="DoneWorkoutButton"
                     variant="secondary"
                     key={"DoneWorkoutButton"+index}
                     value={index}
@@ -86,7 +87,7 @@ export default function WorkoutBody({
                     Done
                 </Button>
                 <Button
-                    className="CancelEditWorkoutButton"
+                    className="CancelWorkoutButton"
                     variant="danger"
                     key={"CancelWorkoutButton"+index}
                     onClick={cancelEditWorkout}>

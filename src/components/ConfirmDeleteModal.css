@@ -1,0 +1,15 @@
+.ModalTitle {
+    font-size: 1.5rem;
+    font-weight: 500 !important;
+}
+.SetLengthInModal {
+    font-size: 1.25rem;
+}
+.WorkoutTypeInModal {
+    font-size: 1.25rem;
+    font-weight: 500 !important;
+}
+
+.WorkoutMeasureInModal {
+    font-size: 1.25rem;
+}

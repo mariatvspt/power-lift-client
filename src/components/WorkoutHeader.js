@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import { MDBIcon } from 'mdbreact';
 import ErrorTooltip from "../components/ErrorTooltip.js";
+import "./WorkoutHeader.css";
 
 export default function WorkoutHeader({
     workoutName,
