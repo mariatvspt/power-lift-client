@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Form, NavLink } from "react-bootstrap";
 import { MDBIcon } from 'mdbreact';
 import ErrorTooltip from "../components/ErrorTooltip.js";
+import "./SetTab.css"
 
 export default function SetTab({
     workoutSetName,
@@ -12,9 +13,9 @@ export default function SetTab({
     onClickDeleteSetButton,
     onClickEditSetButton,
     // edit (events)
-    onChangeEditWorkoutSetName,
-    confirmEditWorkoutSet,
-    setShowEditSetFields,
+    onChangeWorkoutName,
+    confirmWorkoutSet,
+    cancelWorkoutSet,
     // tooltip
     setNameOverlayTarget,
     emptySetNameError,
@@ -47,24 +48,24 @@ export default function SetTab({
             </NavLink>
         }
         {
-            type == "edit" &&
-            <Form key={"SetForm"+index} className="form-inline EditSetForm">
+            (type == "edit" || type =="new") &&
+            <Form key={"SetForm"+index} className="form-inline SetForm">
                 <Form.Control
                     ref={setNameOverlayTarget}
                     className="EditSetFormControl"
-                    placeholder="Edit Set Name"
+                    placeholder= {type == "edit" ? "Edit Set Name" : "New Set Name"}
                     defaultValue={workoutSetName}
                     key={"SetFormControl"+index}
-                    onChange={onChangeEditWorkoutSetName}/>
+                    onChange={onChangeWorkoutName}/>
                 <ErrorTooltip
                     key={"EmptySetNameTooltip"+index}
-                    target={setNameOverlayTarget.current}
+                    target={setNameOverlayTarget}
                     show={emptySetNameError}
                     placement="left"
                     type="empty"/>
                 <ErrorTooltip
                     key={"DuplicateSetNameTooltip"+index}
-                    target={setNameOverlayTarget.current}
+                    target={setNameOverlayTarget}
                     show={duplicateSetNameError}
                     placement="left"
                     type="duplicate"/>
@@ -73,14 +74,14 @@ export default function SetTab({
                     className="EditSetButtons"
                     variant="info"
                     key={"ConfirmEditSetButton"+index}
-                    onClick={confirmEditWorkoutSet}>
+                    onClick={confirmWorkoutSet}>
                     <MDBIcon key={"ConfirmEditSetIcon"+index} icon="check"/>
                 </Button>
                 <Button
                     className="EditSetButtons"
                     variant="danger"
                     key={"CancelEditSetButton"+index}
-                    onClick={setShowEditSetFields}>
+                    onClick={cancelWorkoutSet}>
                     <MDBIcon key={"CancelEditSetIcon"+index} icon="times"/>
                 </Button>
             </Form>

@@ -47,7 +47,7 @@ export default function WorkoutHeader({
               onChange={onChangeEditWorkoutName}/>
             <ErrorTooltip
               key={"WorkoutHeaderTooltip"+index}
-              target={editSetNameOverlayTarget.current}
+              target={editSetNameOverlayTarget}
               show={emptyEditWorkoutNameError}
               placement="right"
               type="empty"/>

@@ -68,7 +68,7 @@ export default function WorkoutBody({
                     key={"EditWorkoutMeasure"+index}
                     onChange={onChangeEditWorkoutMeasure}/>
                 <ErrorTooltip
-                    target={editSetMeasureOverlayTarget.current}
+                    target={editSetMeasureOverlayTarget}
                     show={emptyEditWorkoutMeasureError}
                     placement="right"
                     type="empty"

@@ -56,7 +56,7 @@ export default function ViewNotes() {
     // add new set
     const [showNewSetFields, setShowNewSetFields] = useState(false);
     const [newSetName, setNewSetName] = useState("");
-    const [duplicateNewSetNameError, setDuplicateNewSetNameError] = useState(true);
+    const [duplicateNewSetNameError, setDuplicateNewSetNameError] = useState(false);
     const [emptyNewSetNameError, setEmptyNewSetNameError] = useState(true);
 
     // add new workout
@@ -163,9 +163,9 @@ export default function ViewNotes() {
                 workoutSetName={workoutSetName}
                 index={i}
                 type="edit"
-                onChangeEditWorkoutSetName={e => onChangeEditWorkoutSetName(e, allSets, i, setUpdatedWorkoutSetName, setEmptySetNameError, setDuplicateSetNameError)}
-                confirmEditWorkoutSet={e => confirmEditWorkoutSet(allData, allSets, updatedWorkoutSetName, i, setShowEditSetFields, setAllSets, setAllData, setKey)}
-                setShowEditSetFields={e => setShowEditSetFields(-1)}
+                onChangeWorkoutName={e => onChangeEditWorkoutSetName(e, allSets, i, setUpdatedWorkoutSetName, setEmptySetNameError, setDuplicateSetNameError)}
+                confirmWorkoutSet={e => confirmEditWorkoutSet(allData, allSets, updatedWorkoutSetName, i, setShowEditSetFields, setAllSets, setAllData, setKey)}
+                cancelWorkoutSet={e => setShowEditSetFields(-1)}
                 setNameOverlayTarget={setNameOverlayTarget}
                 emptySetNameError={emptySetNameError}
                 duplicateSetNameError={duplicateSetNameError}/>
@@ -281,27 +281,14 @@ export default function ViewNotes() {
             <>
                 <AddButton type="Set" setShowNewFields={e => setShowNewSetFields(!showNewSetFields)}/>
                 { showNewSetFields &&
-                    <Form className="form-inline EditSetForm">
-                    <Form.Control
-                        key="NewSetForm"
-                        ref={newSetNameOverlayTarget}
-                        className="EditSetFormControl"
-                        placeholder="New Set Name"
-                        onChange={e => onChangeNewSetName(e, allSets, setNewSetName, setEmptyNewSetNameError, setDuplicateNewSetNameError)}/>
-                    <ErrorTooltip target={newSetNameOverlayTarget.current} show={emptyNewSetNameError} placement="left" type="empty"/>
-                    <ErrorTooltip target={newSetNameOverlayTarget.current} show={duplicateNewSetNameError} placement="left" type="duplicate"/>
-                    <Button
-                        disabled={emptyNewSetNameError || duplicateNewSetNameError}
-                        key="NewSetDoneButton"
-                        className="EditSetButtons"
-                        variant="info"
-                        onClick={e => onClickNewSetDoneButton(allData, allSets, newSetName, setShowNewSetFields, setAllSets, setAllData)}>
-                        <MDBIcon icon="check"/>
-                    </Button>
-                    <Button key="CancelNewSetButton" className="EditSetButtons" variant="danger" onClick={e => setShowNewSetFields(false)}>
-                        <MDBIcon icon="times"/>
-                    </Button>
-                </Form>
+                    <SetTab
+                        type="new"
+                        onChangeWorkoutName={e => onChangeNewSetName(e, allSets, setNewSetName, setEmptyNewSetNameError, setDuplicateNewSetNameError)}
+                        setNameOverlayTarget={newSetNameOverlayTarget}
+                        emptySetNameError={emptyNewSetNameError}
+                        duplicateSetNameError={duplicateNewSetNameError}
+                        confirmWorkoutSet={e => onClickNewSetDoneButton(allData, allSets, newSetName, setShowNewSetFields, setAllSets, setAllData)}
+                        cancelWorkoutSet={e => setShowNewSetFields(false)}/>
                 }
             </>
         );
