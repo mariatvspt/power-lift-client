@@ -32,7 +32,6 @@ export default function ViewNotes() {
 
     // edit workout
     const [showEditWorkoutFields, setShowEditWorkoutFields] = useState(-1);
-    // const [editWorkoutDropDownTitle, setEditWorkoutDropDownTitle] = useState("");
     const [editWorkoutUnits, setEditWorkoutUnits] = useState("");
     const [workoutMeasurePlaceholder, setWorkoutMeasurePlaceholder] = useState("");
     const [updatedWorkoutName, setUpdatedWorkoutName] = useState("");
@@ -89,59 +88,6 @@ export default function ViewNotes() {
         fetchSets();
     }, []);
 
-    /*** DISPLAY MODALS ***/
-
-    function displayDeleteSetModal() {
-        return (
-            <ConfirmDeleteModal
-                type="set"
-                showModal={showDeleteSetModal}
-                hideModal={e => setShowDeleteSetModal(false)}
-                modalTitle={deletedSet}
-                deletedSetLength={deletedSetLength}
-                cancelDelete={e => setShowDeleteSetModal(false)}
-                confirmDelete={e => confirmDeleteWorkoutSet(allData, deletedSet, setShowDeleteSetModal, setAllData, setAllSets)}/>
-        );
-    }
-
-     function displayDeleteWorkoutModal() {
-        return (
-            <ConfirmDeleteModal
-                type="workout"
-                showModal={showDeleteWorkoutModal}
-                hideModal={e => setShowDeleteWorkoutModal(false)}
-                modalTitle={deletedWorkoutName}
-                deletedWorkoutMeasureType={deletedWorkoutMeasureType}
-                deletedWorkoutMeasure={deletedWorkoutMeasure}
-                cancelDelete={e => setShowDeleteWorkoutModal(false)}
-                confirmDelete={e => confirmDeleteWorkout(allData, deletedWorkoutSetName, deletedWorkoutIndex, setShowDeleteWorkoutModal, setAllData)}/>
-            // <Modal show={showDeleteWorkoutModal} onHide={e => setShowDeleteWorkoutModal(false)} style={{opacity:1}}>
-            //     <Modal.Header closeButton>
-            //         <Modal.Title>Are you sure you want to delete this workout?</Modal.Title>
-            //     </Modal.Header>
-            //     <Modal.Body>
-            //         <p className="WorkoutNameInModal">{deletedWorkoutName}</p>
-            //         {deletedWorkoutMeasureType == "workoutReps" && 
-            //             <>
-            //                 <p className="WorkoutTypeInModal">Number of Reps:</p>
-            //                 <p className="WorkoutMeasureInModal">{deletedWorkoutMeasure} reps</p>
-            //             </>
-            //         }
-            //         {deletedWorkoutMeasureType == "workoutTime" &&
-            //             <>
-            //                 <p className="WorkoutTypeInModal">Workout Time:</p>
-            //                 <p className="WorkoutMeasureInModal">{deletedWorkoutMeasure} seconds</p>
-            //             </>
-            //         }
-            //     </Modal.Body>
-            //     <Modal.Footer>
-            //         <Button onClick={e => setShowDeleteWorkoutModal(false)} variant="secondary">Cancel</Button>
-            //         <Button onClick={e => confirmDeleteWorkout(allData, deletedWorkoutSetName, deletedWorkoutIndex, setShowDeleteWorkoutModal, setAllData)} variant="danger">Delete</Button>
-            //     </Modal.Footer>
-            // </Modal>
-        );
-    }
-
     /*** DISPLAY SETS ***/
 
     function displayAllSets() {
@@ -151,12 +97,8 @@ export default function ViewNotes() {
             allSetsArray.push(
                 <NavItem key={"set"+i}>
                     {   showEditSetFields == i
-                        ? <>
-                            {displayEditSetFields(allSets[i], i)}
-                        </>
-                        :<>
-                            {displayEachSet(allSets[i], i)}
-                        </>   
+                        ? <> {displayEditSetFields(allSets[i], i)} </>
+                        : <> {displayEachSet(allSets[i], i)} </>   
                     }
                 </NavItem>
             );
@@ -334,8 +276,22 @@ export default function ViewNotes() {
 
   return (
     <div className="ViewNotes">
-        {displayDeleteWorkoutModal()}
-        {displayDeleteSetModal()}
+        <ConfirmDeleteModal
+            type="set"
+            showModal={showDeleteSetModal}
+            hideModal={e => setShowDeleteSetModal(false)}
+            modalTitle={deletedSet}
+            deletedSetLength={deletedSetLength}
+            cancelDelete={e => setShowDeleteSetModal(false)}/>
+        <ConfirmDeleteModal
+            type="workout"
+            showModal={showDeleteWorkoutModal}
+            hideModal={e => setShowDeleteWorkoutModal(false)}
+            modalTitle={deletedWorkoutName}
+            deletedWorkoutMeasureType={deletedWorkoutMeasureType}
+            deletedWorkoutMeasure={deletedWorkoutMeasure}
+            cancelDelete={e => setShowDeleteWorkoutModal(false)}
+            confirmDelete={e => confirmDeleteWorkout(allData, deletedWorkoutSetName, deletedWorkoutIndex, setShowDeleteWorkoutModal, setAllData)}/>
         <TabContainer activeKey={key}>
             <Row>
                 <Col sm={3}>
