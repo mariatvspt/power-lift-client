@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Modal, Button, Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem } from "react-bootstrap";
+import { Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem } from "react-bootstrap";
 // controllers
 import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
 import { cancelEditWorkout, confirmEditWorkout, confirmDeleteWorkout, onChangeEditWorkoutName, onChangeEditWorkoutMeasure, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, onSelectWorkoutMeasureType } from "../controllers/DisplayWorkoutsController.js"
@@ -282,7 +282,8 @@ export default function ViewNotes() {
             hideModal={e => setShowDeleteSetModal(false)}
             modalTitle={deletedSet}
             deletedSetLength={deletedSetLength}
-            cancelDelete={e => setShowDeleteSetModal(false)}/>
+            cancelDelete={e => setShowDeleteSetModal(false)}
+            confirmDelete={e => confirmDeleteWorkoutSet(allData, deletedSet, setShowDeleteSetModal, setAllData, setAllSets)}/>
         <ConfirmDeleteModal
             type="workout"
             showModal={showDeleteWorkoutModal}
