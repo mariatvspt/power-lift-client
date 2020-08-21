@@ -11,18 +11,17 @@ export function includes(target, array) {
 }
 
  // Set state of the workout measure fields
-export function onSelectWorkoutMeasureType(e, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType) {
+export function onSelectWorkoutMeasureType(e, setUpdatedWorkoutMeasureType, setWorkoutMeasurePlaceholder, setUnits) {
     if(e == "workoutTime") {
-        setEditWorkoutDropDownTitle("Workout Time");
+        setUpdatedWorkoutMeasureType("Workout Time");
         setWorkoutMeasurePlaceholder("Edit workout time");
         setUnits("seconds");
     }
     else if(e == "workoutReps") {
-        setEditWorkoutDropDownTitle("Number of Reps");
+        setUpdatedWorkoutMeasureType("Number of Reps");
         setWorkoutMeasurePlaceholder("Edit number of reps");
         setUnits("reps");
     }
-    setUpdatedWorkoutMeasureType(e);
 }
 
 /*** ON CHANGE ***/
@@ -51,11 +50,11 @@ export function onChangeEditWorkoutMeasure(e, setUpdatedWorkoutMeasure, setEmpty
 /*** ON CLICK ***/
 
 // "Edit workout" button is clicked
-export function onClickEditWorkoutButton(workoutMeasureType, workoutName, workoutMeasure, index, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType) {
+export function onClickEditWorkoutButton(workoutMeasureType, workoutName, workoutMeasure, index, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType) {
     setShowEditWorkoutFields(index);
     setUpdatedWorkoutName(workoutName);
     setUpdatedWorkoutMeasure(workoutMeasure);
-    onSelectWorkoutMeasureType(workoutMeasureType, setDropDownTitle, setWorkoutMeasurePlaceholder, setUnits, setUpdatedWorkoutMeasureType); 
+    onSelectWorkoutMeasureType(workoutMeasureType, setUpdatedWorkoutMeasureType, setWorkoutMeasurePlaceholder, setUnits); 
 }
 
 // "Delete workout" button is clicked
@@ -82,7 +81,7 @@ export function confirmEditWorkout(allData, set, updatedWorkoutName, updatedWork
     rerenderAfterEditingWorkout(allData, set, updatedWorkoutName, updatedWorkoutMeasureType, updatedWorkoutMeasure, index, setShowEditWorkoutFields, setAllData);
     
     let request = {};
-    if(updatedWorkoutMeasureType == "workoutReps") {
+    if(updatedWorkoutMeasureType == "Number of Reps") {
         request = {
             method: "post",
             headers: {
@@ -96,7 +95,7 @@ export function confirmEditWorkout(allData, set, updatedWorkoutName, updatedWork
             })
         };
     }
-    else if(updatedWorkoutMeasureType == "workoutTime") {
+    else if(updatedWorkoutMeasureType == "Workout Time") {
         request = {
             method: "post",
             headers: {
@@ -144,12 +143,12 @@ function rerenderAfterEditingWorkout(allData, set, updatedWorkoutName, updatedWo
     let updatedWorkouts = {...allData};
     let updatedWorkout = {};
 
-    if(updatedWorkoutMeasureType == "workoutReps")
+    if(updatedWorkoutMeasureType == "Number of Reps")
     updatedWorkout = {
         workoutName: updatedWorkoutName,
         workoutReps: updatedWorkoutMeasure
     }
-    else if(updatedWorkoutMeasureType == "workoutTime")
+    else if(updatedWorkoutMeasureType == "Workout Time")
     updatedWorkout = {
         workoutName: updatedWorkoutName,
         workoutTime: updatedWorkoutMeasure

@@ -7,7 +7,6 @@ import { cancelEditWorkout, confirmEditWorkout, confirmDeleteWorkout, onChangeEd
 import { onChangeNewWorkoutName, onChangeNewWorkoutMeasure, onClickNewWorkoutDoneButton, onSelectNewWorkoutDropdown } from "../controllers/AddNewWorkoutController.js";
 import { onChangeNewSetName, onClickNewSetDoneButton } from "../controllers/AddNewSetController.js";
 // components
-import ErrorTooltip from "../components/ErrorTooltip.js"; // to be removed?
 import WorkoutHeader from "../components/WorkoutHeader.js";
 import WorkoutBody from "../components/WorkoutBody.js";
 import SetTab from "../components/SetTab.js";
@@ -33,7 +32,7 @@ export default function ViewNotes() {
 
     // edit workout
     const [showEditWorkoutFields, setShowEditWorkoutFields] = useState(-1);
-    const [editWorkoutDropDownTitle, setEditWorkoutDropDownTitle] = useState("");
+    // const [editWorkoutDropDownTitle, setEditWorkoutDropDownTitle] = useState("");
     const [editWorkoutUnits, setEditWorkoutUnits] = useState("");
     const [workoutMeasurePlaceholder, setWorkoutMeasurePlaceholder] = useState("");
     const [updatedWorkoutName, setUpdatedWorkoutName] = useState("");
@@ -250,12 +249,12 @@ export default function ViewNotes() {
                     type="edit"
                     emptyWorkoutNameError={emptyEditWorkoutNameError}
                     emptyWorkoutMeasureError={emptyEditWorkoutMeasureError}
-                    workoutDropDownTitle={editWorkoutDropDownTitle}
+                    workoutDropDownTitle={updatedWorkoutMeasureType}
                     workoutUnits={editWorkoutUnits}
                     workoutMeasurePlaceholder={workoutMeasurePlaceholder}
                     workoutMeasureOverlayTarget={workoutMeasureOverlayTarget}
                     onChangeEditWorkoutMeasure={e => onChangeEditWorkoutMeasure(e, setUpdatedWorkoutMeasure, setEmptyEditWorkoutMeasureError)}
-                    onSelectWorkoutMeasureType={e => onSelectWorkoutMeasureType(e, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}
+                    onSelectWorkoutMeasureType={e => onSelectWorkoutMeasureType(e, setUpdatedWorkoutMeasureType, setWorkoutMeasurePlaceholder, setEditWorkoutUnits)}
                     confirmEditWorkout={e => confirmEditWorkout(allData, set, updatedWorkoutName, updatedWorkoutMeasureType, updatedWorkoutMeasure, i, setShowEditWorkoutFields, setAllData)}
                     cancelEditWorkout={e => cancelEditWorkout(setShowEditWorkoutFields, setEmptyEditWorkoutNameError, setEmptyEditWorkoutMeasureError)}/>
             </>
@@ -269,7 +268,7 @@ export default function ViewNotes() {
                     workoutName={workoutName}
                     index={i}
                     onClickDeleteWorkoutButton={e => onClickDeleteWorkoutButton(set, workoutName, measureType, workoutMeasure, i, setShowDeleteWorkoutModal, setDeletedWorkoutSetName, setDeletedWorkoutName, setDeletedWorkoutMeasureType, setDeletedWorkoutMeasure, setDeletedWorkoutIndex)}
-                    onClickEditWorkoutButton={e => onClickEditWorkoutButton(measureType, workoutName, workoutMeasure, i, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, setEditWorkoutDropDownTitle, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}/>
+                    onClickEditWorkoutButton={e => onClickEditWorkoutButton(measureType, workoutName, workoutMeasure, i, setShowEditWorkoutFields, setUpdatedWorkoutName, setUpdatedWorkoutMeasure, setWorkoutMeasurePlaceholder, setEditWorkoutUnits, setUpdatedWorkoutMeasureType)}/>
                 <WorkoutBody
                     measureType={measureType}
                     workoutMeasure={workoutMeasure}
@@ -304,12 +303,6 @@ export default function ViewNotes() {
                 <AddButton type="Workout" setShowNewFields={e => setShowNewWorkoutFields(!showNewWorkoutFields)}/>
                 { showNewWorkoutFields &&
                     <Card key="NewWorkoutCard">
-                        {/* <Card.Header key="NewWorkoutCardHeader" className="NewWorkoutHeader">
-                            <Form.Control
-                                key="NewWorkoutForm"
-                                placeholder="New Workout Name"
-                                onChange={e => onChangeNewWorkoutName(e, setNewWorkoutName, setDisableNewWorkoutDropdown)}/>
-                        </Card.Header> */}
                         <WorkoutHeader
                             type="new"
                             onChangeWorkoutName={e => onChangeNewWorkoutName(e, setNewWorkoutName, setEmptyNewWorkoutNameError)}
@@ -327,51 +320,7 @@ export default function ViewNotes() {
                             onSelectWorkoutMeasureType={e => onSelectNewWorkoutDropdown(e, emptyNewWorkoutMeasureTypeError, setNewWorkoutMeasureType, setEmptyNewWorkoutMeasureTypeError, setNewWorkoutUnits, setNewWorkoutMeasurePlaceholder, setEmptyNewWorkoutMeasureError)}
                             onChangeEditWorkoutMeasure={e => onChangeNewWorkoutMeasure(e, setNewWorkoutMeasure, setEmptyNewWorkoutMeasureError)}
                             confirmEditWorkout={e => onClickNewWorkoutDoneButton(allData, set, newWorkoutName, newWorkoutMeasureType, newWorkoutMeasure, setShowNewWorkoutFields, setAllData)}
-                            cancelEditWorkout={e => setShowNewWorkoutFields(false)}
-
-                            // fix the "setNewWorkoutMeasureType" parameter in onSelectWorkoutMeasureType tag
-                        />
-                        {/* <Card.Body key="NewWorkoutCardBody">
-                            <DropdownButton
-                                disabled={disableNewWorkoutDropdown}
-                                key="NewWorkoutMeasureTypeDropdown"
-                                size="lg"
-                                variant="outline-dark"
-                                onSelect={e => onSelectNewWorkoutDropdown(e, setNewWorkoutMeasureType, setDisableNewWorkoutMeasure, setNewWorkoutUnits)}
-                                title={newWorkoutMeasureType}>
-                                <Dropdown.Item
-                                    key="newWorkoutDropdownWorkoutTime"
-                                    eventKey="Workout Time">
-                                        Workout Time
-                                </Dropdown.Item>
-                                <Dropdown.Item
-                                    key="newWorkoutDropdownWorkoutReps"
-                                    eventKey="Number of Reps">
-                                        Number of Reps
-                                </Dropdown.Item>
-                            </DropdownButton>
-                            <Form.Control
-                                key="NewWorkoutMeasure"
-                                disabled={disableNewWorkoutMeasure}
-                                placeholder={workoutMeasurePlaceholder}
-                                onChange={e => onChangeNewWorkoutMeasure(e, setNewWorkoutMeasure, setDisableNewWorkoutDoneButton)}/>
-                                <p>{newWorkoutUnits}</p>
-                                <Button
-                                    disabled={disableNewWorkoutDoneButton}
-                                    className="DoneNewWorkoutButton"
-                                    variant="secondary"
-                                    key="DoneNewWorkoutButton"
-                                    onClick={e => onClickNewWorkoutDoneButton(allData, set, newWorkoutName, newWorkoutMeasureType, newWorkoutMeasure, setShowNewWorkoutFields, setAllData)}>
-                                    Done
-                                </Button>
-                                <Button
-                                    key="CancelNewWorkoutButton"
-                                    className="CancelNewWorkoutButton"
-                                    variant="danger"
-                                    onClick={e => setShowNewWorkoutFields(false)}>
-                                    Cancel
-                                </Button>
-                        </Card.Body> */}
+                            cancelEditWorkout={e => setShowNewWorkoutFields(false)}/>
                     </Card>
                 }       
             </>
