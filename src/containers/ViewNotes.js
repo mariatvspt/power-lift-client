@@ -66,16 +66,7 @@ export default function ViewNotes() {
     const [newWorkoutMeasurePlaceholder, setNewWorkoutMeasurePlaceholder] = useState("");
     const [emptyNewWorkoutNameError, setEmptyNewWorkoutNameError] = useState(true);
     const [emptyNewWorkoutMeasureTypeError, setEmptyNewWorkoutMeasureTypeError] = useState(true);
-    const [emptyNewWorkoutMeasureError, setEmptyNewWorkoutMeasureError] = useState(false);
-
-    // tooltip overlay targets
-    const setNameOverlayTarget = useRef(null);
-    const newSetNameOverlayTarget = useRef(null);
-    const workoutNameOverlayTarget = useRef(null);
-    const workoutMeasureOverlayTarget = useRef(null);
-    const newWorkoutNameOverlayTarget = useRef(null);
-    const newWorkoutMeasureOverlayTarget = useRef(null);
-    
+    const [emptyNewWorkoutMeasureError, setEmptyNewWorkoutMeasureError] = useState(false);    
 
     useEffect(() => {
         // Fetch all sets with view_all API
@@ -116,7 +107,6 @@ export default function ViewNotes() {
                 onChangeSetName={e => onChangeEditWorkoutSetName(e, allSets, i, setUpdatedWorkoutSetName, setEmptySetNameError, setDuplicateSetNameError)}
                 confirmWorkoutSet={e => confirmEditWorkoutSet(allData, allSets, updatedWorkoutSetName, i, setShowEditSetFields, setAllSets, setAllData, setKey)}
                 cancelWorkoutSet={e => setShowEditSetFields(-1)}
-                setNameOverlayTarget={setNameOverlayTarget}
                 emptySetNameError={emptySetNameError}
                 duplicateSetNameError={duplicateSetNameError}/>
         );
@@ -164,18 +154,13 @@ export default function ViewNotes() {
                     <Card className="WorkoutCard" key={"WorkoutCardKey"+i}>
                         {
                             showEditWorkoutFields == i
-                            ? <>
-                                {displayEditWorkoutFields(set, workoutName, workoutMeasure, i)}
-                            </>
-                            : <>
-                                {displayEachWorkout(set, workoutName, measureType, workoutMeasure, i)}
-                            </>
+                            ? <> {displayEditWorkoutFields(set, workoutName, workoutMeasure, i)} </>
+                            : <> {displayEachWorkout(set, workoutName, measureType, workoutMeasure, i)} </>
                         }
                     </Card>
                 </>
             );
         }
-
 
         return allWorkoutsArray;
     }
@@ -188,7 +173,6 @@ export default function ViewNotes() {
                     index={i}
                     type="edit"
                     onChangeWorkoutName={e => onChangeEditWorkoutName(e, setUpdatedWorkoutName, setEmptyEditWorkoutNameError)}
-                    workoutNameOverlayTarget={workoutNameOverlayTarget}
                     emptyWorkoutNameError={emptyEditWorkoutNameError}/>
                 <WorkoutBody
                     workoutMeasure={workoutMeasure}
@@ -199,7 +183,6 @@ export default function ViewNotes() {
                     workoutDropDownTitle={updatedWorkoutMeasureType}
                     workoutUnits={editWorkoutUnits}
                     workoutMeasurePlaceholder={workoutMeasurePlaceholder}
-                    workoutMeasureOverlayTarget={workoutMeasureOverlayTarget}
                     onChangeEditWorkoutMeasure={e => onChangeEditWorkoutMeasure(e, setUpdatedWorkoutMeasure, setEmptyEditWorkoutMeasureError)}
                     onSelectWorkoutMeasureType={e => onSelectWorkoutMeasureType(e, setUpdatedWorkoutMeasureType, setWorkoutMeasurePlaceholder, setEditWorkoutUnits)}
                     confirmEditWorkout={e => confirmEditWorkout(allData, set, updatedWorkoutName, updatedWorkoutMeasureType, updatedWorkoutMeasure, i, setShowEditWorkoutFields, setAllData)}
@@ -234,7 +217,6 @@ export default function ViewNotes() {
                     <SetTab
                         type="new"
                         onChangeSetName={e => onChangeNewSetName(e, allSets, setNewSetName, setEmptyNewSetNameError, setDuplicateNewSetNameError)}
-                        setNameOverlayTarget={newSetNameOverlayTarget}
                         emptySetNameError={emptyNewSetNameError}
                         duplicateSetNameError={duplicateNewSetNameError}
                         confirmWorkoutSet={e => onClickNewSetDoneButton(allData, allSets, newSetName, setShowNewSetFields, setAllSets, setAllData)}
@@ -253,7 +235,6 @@ export default function ViewNotes() {
                         <WorkoutHeader
                             type="new"
                             onChangeWorkoutName={e => onChangeNewWorkoutName(e, setNewWorkoutName, setEmptyNewWorkoutNameError)}
-                            workoutNameOverlayTarget={newWorkoutNameOverlayTarget}
                             emptyWorkoutNameError={emptyNewWorkoutNameError}/>
                         <WorkoutBody
                             type="new"
@@ -263,7 +244,6 @@ export default function ViewNotes() {
                             workoutUnits={newWorkoutUnits}
                             workoutMeasurePlaceholder={newWorkoutMeasurePlaceholder}
                             emptyWorkoutMeasureTypeError={emptyNewWorkoutMeasureTypeError}
-                            workoutMeasureOverlayTarget={newWorkoutMeasureOverlayTarget}
                             onSelectWorkoutMeasureType={e => onSelectNewWorkoutDropdown(e, emptyNewWorkoutMeasureTypeError, setNewWorkoutMeasureType, setEmptyNewWorkoutMeasureTypeError, setNewWorkoutUnits, setNewWorkoutMeasurePlaceholder, setEmptyNewWorkoutMeasureError)}
                             onChangeEditWorkoutMeasure={e => onChangeNewWorkoutMeasure(e, setNewWorkoutMeasure, setEmptyNewWorkoutMeasureError)}
                             confirmEditWorkout={e => onClickNewWorkoutDoneButton(allData, set, newWorkoutName, newWorkoutMeasureType, newWorkoutMeasure, setShowNewWorkoutFields, setAllData)}

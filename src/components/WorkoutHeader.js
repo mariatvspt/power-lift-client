@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import { MDBIcon } from 'mdbreact';
-import ErrorTooltip from "../components/ErrorTooltip.js";
+import TooltipInfo from "../components/TooltipInfo.js";
 import "./WorkoutHeader.css";
 
 export default function WorkoutHeader({
@@ -14,14 +14,27 @@ export default function WorkoutHeader({
     // edit workout header (events)
     onChangeWorkoutName,
     // tooltip
-    workoutNameOverlayTarget,
     emptyWorkoutNameError
 }) {
+  const workoutNameOverlayTarget = useRef(null);
+
   return (
     <Card.Header className="WorkoutHeader" key={"CardHeaderKey"+index}>
         { type == "display" &&
           <>
             {workoutName}
+            <TooltipInfo
+              key={"ReorderWorkoutTooltip"+index}
+              type="hover"
+              placement="right"
+              text="Drag to reorder workout in this set."
+              hoverButton={
+                <Button
+                  className="ModifyWorkoutButton"
+                  variant="light"
+                  key={"hoverButton"+index}>
+                    <MDBIcon key={"EditWorkoutIcon"+index} icon="bars"/>
+                  </Button>}/>
             <Button
               className="ModifyWorkoutButton"
               variant="danger"
@@ -48,7 +61,7 @@ export default function WorkoutHeader({
               defaultValue={workoutName}
               key={"EditWorkoutForm"+index}
               onChange={onChangeWorkoutName}/>
-            <ErrorTooltip
+            <TooltipInfo
               key={"WorkoutHeaderTooltip"+index}
               target={workoutNameOverlayTarget}
               show={emptyWorkoutNameError}
