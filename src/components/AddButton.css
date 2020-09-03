@@ -1,0 +1,8 @@
+.AddButton {
+    background-color: white !important;
+    border-color: black !important;
+}
+
+.AddButton:hover {
+    background: #f8f9fa !important;
+}
