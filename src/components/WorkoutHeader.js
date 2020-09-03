@@ -27,14 +27,15 @@ export default function WorkoutHeader({
               key={"ReorderWorkoutTooltip"+index}
               type="hover"
               placement="right"
-              text="Drag to reorder workout in this set."
+              text="Click anywhere in this card to reorder the workout in this set."
               hoverButton={
-                <Button
-                  className="ModifyWorkoutButton"
-                  variant="light"
-                  key={"hoverButton"+index}>
-                    <MDBIcon key={"EditWorkoutIcon"+index} icon="bars"/>
-                  </Button>}/>
+                // <Button
+                //   className="ModifyWorkoutButton"
+                //   variant="light"
+                //   key={"hoverButton"+index}>
+                    <MDBIcon className="ReorderWorkoutIcon" key={"ReorderWorkoutIcon"+index} icon="bars"/>
+              }/>
+                  {/* </Button>}/> */}
             <Button
               className="ModifyWorkoutButton"
               variant="danger"

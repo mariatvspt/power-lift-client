@@ -85,13 +85,13 @@ export function confirmEditWorkout(allData, set, updatedWorkoutName, updatedWork
         request = {
             method: "post",
             headers: {
-            "Content-Type":"application/json"
+                "Content-Type":"application/json"
             },
             body: JSON.stringify({
-            workoutSetName: set,
-            workoutIndex: index,
-            workoutName: updatedWorkoutName,
-            workoutReps: updatedWorkoutMeasure
+                workoutSetName: set,
+                workoutIndex: index,
+                workoutName: updatedWorkoutName,
+                workoutReps: updatedWorkoutMeasure
             })
         };
     }
@@ -99,13 +99,13 @@ export function confirmEditWorkout(allData, set, updatedWorkoutName, updatedWork
         request = {
             method: "post",
             headers: {
-            "Content-Type":"application/json"
+                "Content-Type":"application/json"
             },
             body: JSON.stringify({
-            workoutSetName: set,
-            workoutIndex: index,
-            workoutName: updatedWorkoutName,
-            workoutTime: updatedWorkoutMeasure
+                workoutSetName: set,
+                workoutIndex: index,
+                workoutName: updatedWorkoutName,
+                workoutTime: updatedWorkoutMeasure
             })
         };
     }
@@ -125,11 +125,11 @@ export function confirmEditWorkout(allData, set, updatedWorkoutName, updatedWork
         let request = {
             method: "post",
             headers: {
-            "Content-Type":"application/json"
+                "Content-Type":"application/json"
             },
             body: JSON.stringify({
-            workoutSetName: set,
-            workoutIndex: index,
+                workoutSetName: set,
+                workoutIndex: index,
             })
         };
 

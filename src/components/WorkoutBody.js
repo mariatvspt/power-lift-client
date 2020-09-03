@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { Button, Card, Dropdown, DropdownButton, Form } from "react-bootstrap";
 import TooltipInfo from "../components/TooltipInfo.js";
 import "./WorkoutBody.css";
+import "./WorkoutHeader.css";
 
 export default function WorkoutBody({
     workoutMeasure,
@@ -27,7 +28,7 @@ export default function WorkoutBody({
     const workoutMeasureOverlayTarget = useRef(null);
 
     return (
-        <Card.Body key={"CardBodyKey"+index}>
+        <Card.Body className="WorkoutBody" key={"CardBodyKey"+index}>
             { type == "display" && <>
                 { measureType == "workoutTime" &&
                     <>

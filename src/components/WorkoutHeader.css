@@ -7,3 +7,15 @@
     float: right;
     margin-right: 3px;
 }
+
+.ReorderWorkoutIcon {
+    color: lightslategray;
+    opacity: 50%;
+    margin-right: 10px;
+    margin-top: 5px;
+    float: left;
+}
+
+.WorkoutHeader:hover > .ReorderWorkoutIcon {
+    opacity: 100%;
+}

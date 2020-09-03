@@ -142,7 +142,7 @@ app.post('/edit_set', (req,res) => {
 
     return res.status(200).json({
       status: 200,
-      message: 'Sucessfully created a new workout set!',
+      message: 'Sucessfully created edited the workout set!',
       data:  req.body
     })
   }
@@ -167,7 +167,7 @@ app.post('/delete_set', (req,res) => {
 
     return res.status(200).json({
       status: 200,
-      message: 'Sucessfully created a new workout set!',
+      message: 'Sucessfully deleted the workout set!',
       data:  req.body
     })
   }
@@ -230,7 +230,7 @@ app.post('/edit_workout', (req, res) => {
       fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allData));
       return res.status(200).json({
           status: 200,
-          message: 'Sucessfully posted a workout!',
+          message: 'Sucessfully edited a workout!',
           data:  req.body
       })
     }
@@ -255,7 +255,36 @@ app.post('/delete_workout', (req, res) => {
     fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allData));
     return res.status(200).json({
         status: 200,
-        message: 'Sucessfully posted a workout!',
+        message: 'Sucessfully deleted a workout!',
+        data:  req.body
+    })
+  }
+  catch(e){
+      res.status(400).json({
+        status: 400,
+        error: e.message
+      });
+  }
+});
+
+app.post('/reorder_workout', (req, res) => {
+  try {
+    let allData = fs.readFileSync('./notes/posted_workout.json', {encoding:'utf8', flag:'r'});
+    allData = JSON.parse(allData);
+
+    const workoutSetName = req.body.workoutSetName;
+    const startIndex = req.body.startIndex;
+    const endIndex = req.body.endIndex;
+
+    const workoutList = [...allData.workoutSets[workoutSetName]];
+    const [removed] = workoutList.splice(startIndex, 1);
+    workoutList.splice(endIndex, 0, removed);
+    allData.workoutSets[workoutSetName] = workoutList;
+
+    fs.writeFileSync('./notes/posted_workout.json', JSON.stringify(allData));
+    return res.status(200).json({
+        status: 200,
+        message: 'Sucessfully reordered a workout!',
         data:  req.body
     })
   }

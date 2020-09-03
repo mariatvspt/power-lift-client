@@ -1,10 +1,12 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem } from "react-bootstrap";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 // controllers
 import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
 import { cancelEditWorkout, confirmEditWorkout, confirmDeleteWorkout, onChangeEditWorkoutName, onChangeEditWorkoutMeasure, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, onSelectWorkoutMeasureType } from "../controllers/DisplayWorkoutsController.js"
 import { onChangeNewWorkoutName, onChangeNewWorkoutMeasure, onClickNewWorkoutDoneButton, onSelectNewWorkoutDropdown } from "../controllers/AddNewWorkoutController.js";
 import { onChangeNewSetName, onClickNewSetDoneButton } from "../controllers/AddNewSetController.js";
+import { onDragEnd } from "../controllers/ReorderWorkouts.js";
 // components
 import WorkoutHeader from "../components/WorkoutHeader.js";
 import WorkoutBody from "../components/WorkoutBody.js";
@@ -150,19 +152,38 @@ export default function ViewNotes() {
             }
             
             allWorkoutsArray.push(
-                <>
-                    <Card className="WorkoutCard" key={"WorkoutCardKey"+i}>
-                        {
-                            showEditWorkoutFields == i
-                            ? <> {displayEditWorkoutFields(set, workoutName, workoutMeasure, i)} </>
-                            : <> {displayEachWorkout(set, workoutName, measureType, workoutMeasure, i)} </>
-                        }
-                    </Card>
-                </>
+                <Draggable key={"WorkoutCardDraggable"+i} draggableId={i.toString()} index={i}>
+                    {(provided, snapshot) => (
+                        <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}>
+                            <Card className="WorkoutCard" key={"WorkoutCardKey"+provided["draggableProps"]["data-rbd-draggable-id"]}>
+                                {
+                                    showEditWorkoutFields == provided["draggableProps"]["data-rbd-draggable-id"]
+                                    ? <> {displayEditWorkoutFields(set, workoutName, workoutMeasure, provided["draggableProps"]["data-rbd-draggable-id"])} </>
+                                    : <> {displayEachWorkout(set, workoutName, measureType, workoutMeasure, provided["draggableProps"]["data-rbd-draggable-id"])} </>
+                                }
+                            </Card>
+                        </div>
+                    )}
+                </Draggable>
             );
         }
 
-        return allWorkoutsArray;
+        return (
+            <DragDropContext onDragEnd={e => onDragEnd(e, set, allData, setAllData)}>
+                <Droppable droppableId="droppable">
+                    {(provided, snapshot) => (
+                        <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}>
+                            {allWorkoutsArray}
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
+        );
     }
 
     function displayEditWorkoutFields(set, workoutName, workoutMeasure, i) {
