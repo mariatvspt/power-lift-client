@@ -1,13 +1,10 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import Home from "./containers/Home";
 import NotFound from "./containers/NotFound";
 import Login from "./containers/Login"
 import AppliedRoute from "./components/AppliedRoute";
 import Signup from "./containers/Signup";
-import NewNote from "./containers/NewNote";
-import ViewNotes from "./containers/ViewNotes";
-import Notes from "./containers/Notes";
+import Home from "./containers/Home";
 import Settings from "./containers/Settings";
 
 export default function Routes({ appProps }) {
@@ -19,11 +16,8 @@ export default function Routes({ appProps }) {
       <Route exact path="/settings">
         <Settings />
       </Route>
-      <Route exact path="/notes/new">
-        <NewNote />
-      </Route>
-      <Route exact path="/notes/view">
-        <ViewNotes />
+      <Route exact path="/home">
+        <Home />
       </Route>
       {/* <Route exact path="/notes/:id">
         <Notes />
