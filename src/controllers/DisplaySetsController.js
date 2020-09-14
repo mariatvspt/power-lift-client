@@ -51,9 +51,8 @@ export function onClickDeleteSetButton(allData, workoutSetName, setShowDeleteSet
 /*** ON SELECT ***/
 
 // When user select a workout set tab
-export function onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setSetSelected, setShowEditSetFields, setShowNewWorkoutFields) {
-    setKey(allSets[e]);
-    setSetSelected(true);
+export function onSelectWorkoutSetTab(e, allSets, showEditSetFields, setSetName, setShowEditSetFields, setShowNewWorkoutFields) {
+    setSetName(allSets[e]);
 
     // reset classname for enabling/disabling hover for the icons
     const elements = document.getElementsByClassName("SetTab");
@@ -73,11 +72,11 @@ export function onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, set
 /*** CONFIRM ***/
 
 // When user clicks the "check" icon to submit set name edit
-export function confirmEditWorkoutSet(allData, allSets, updatedWorkoutSetName, index, setShowEditSetFields, setAllSets, setAllData, setKey) {
+export function confirmEditWorkoutSet(allData, allSets, updatedWorkoutSetName, index, setShowEditSetFields, setAllSets, setAllData, setSetName) {
     let workoutSetName = allSets[index];
     setShowEditSetFields(-1);
     if(workoutSetName != updatedWorkoutSetName) {
-        rerenderAfterEditingSetName(allData, allSets, workoutSetName, updatedWorkoutSetName, index, setAllSets, setAllData, setKey);
+        rerenderAfterEditingSetName(allData, allSets, workoutSetName, updatedWorkoutSetName, index, setAllSets, setAllData, setSetName);
     }
     
     let request = {
@@ -115,7 +114,7 @@ export function confirmDeleteWorkoutSet(allData, deletedSet, setShowDeleteSetMod
 /*** RERENDER ***/
 
 // Rerender page after finish editing set name
-function rerenderAfterEditingSetName(allData, allSets, workoutSetName, updatedWorkoutSetName, index, setAllSets, setAllData, setKey) {
+function rerenderAfterEditingSetName(allData, allSets, workoutSetName, updatedWorkoutSetName, index, setAllSets, setAllData, setSetName) {
     let updatedSets = [...allSets];
     updatedSets[index] = updatedWorkoutSetName;
     setAllSets(updatedSets);
@@ -126,7 +125,7 @@ function rerenderAfterEditingSetName(allData, allSets, workoutSetName, updatedWo
     delete updatedData[workoutSetName];
     console.log(updatedData);
     setAllData(updatedData);
-    setKey(updatedWorkoutSetName); // remove i think
+    setSetName(updatedWorkoutSetName); // remove i think
 }
 
 // Rerender page after finish deleting set name

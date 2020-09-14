@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem } from "react-bootstrap";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { MDBIcon } from 'mdbreact';
 // controllers
 import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
@@ -19,11 +19,13 @@ import ConfirmDeleteModal from "../components/ConfirmDeleteModal.js";
 import "./Home.css"
 
 export default function Home() {
+    // route
     const history = useHistory();
+    const { set } = useParams();
+
     const [allSets, setAllSets] = useState([]);
     const [allData, setAllData] = useState({});
-    const [key, setKey] = useState("");
-    const [setSelected, setSetSelected] = useState(false);
+    const [setName, setSetName] = useState(set);
     
     // edit set
     const [emptySetNameError, setEmptySetNameError] = useState(false);
@@ -110,7 +112,7 @@ export default function Home() {
                 index={i}
                 type="edit"
                 onChangeSetName={e => onChangeEditWorkoutSetName(e, allSets, i, setUpdatedWorkoutSetName, setEmptySetNameError, setDuplicateSetNameError)}
-                confirmWorkoutSet={e => confirmEditWorkoutSet(allData, allSets, updatedWorkoutSetName, i, setShowEditSetFields, setAllSets, setAllData, setKey)}
+                confirmWorkoutSet={e => confirmEditWorkoutSet(allData, allSets, updatedWorkoutSetName, i, setShowEditSetFields, setAllSets, setAllData, setSetName)}
                 cancelWorkoutSet={e => setShowEditSetFields(-1)}
                 emptySetNameError={emptySetNameError}
                 duplicateSetNameError={duplicateSetNameError}/>
@@ -122,7 +124,7 @@ export default function Home() {
             <SetTab
                 workoutSetName={workoutSetName}
                 index={i}
-                onSelectWorkoutSetTab={e => onSelectWorkoutSetTab(e, allSets, showEditSetFields, setKey, setSetSelected, setShowEditSetFields, setShowNewWorkoutFields)}
+                onSelectWorkoutSetTab={e => onSelectWorkoutSetTab(e, allSets, showEditSetFields, setSetName, setShowEditSetFields, setShowNewWorkoutFields)}
                 onClickDeleteSetButton={e => onClickDeleteSetButton(allData, workoutSetName, setShowDeleteSetModal, setDeletedSet, setDeletedSetLength)}
                 onClickEditSetButton={e => onClickEditSetButton(workoutSetName, i, setShowEditSetFields, setUpdatedWorkoutSetName)}/>
         );
@@ -300,7 +302,7 @@ export default function Home() {
             deletedWorkoutMeasure={deletedWorkoutMeasure}
             cancelDelete={e => setShowDeleteWorkoutModal(false)}
             confirmDelete={e => confirmDeleteWorkout(allData, deletedWorkoutSetName, deletedWorkoutIndex, setShowDeleteWorkoutModal, setAllData)}/>
-        <TabContainer activeKey={key}>
+        <TabContainer activeKey={setName}>
             <Row>
                 <Col sm={3}>
                     <h1>Sets</h1>
@@ -313,18 +315,18 @@ export default function Home() {
                     </Nav>
                 </Col>
                 <Col sm={9}>
-                    { setSelected &&
+                    { includes(setName, allSets) &&
                         <>
                             <h2>
                                 {'Workouts \t'}
-                                <MDBIcon far icon="play-circle" type="button" onClick={e => history.push(`/play/${key}`)}/>
+                                <MDBIcon far icon="play-circle" type="button" onClick={e => history.push(`/play/${setName}`)}/>
                             </h2>
                             <Dropdown.Divider />
                         </>
                     }
                     <TabContent>
-                        {includes(key, allSets) && displayAllWorkouts(key)}
-                        {setSelected && addNewWorkout(key)}
+                        {includes(setName, allSets) && displayAllWorkouts(setName)}
+                        {includes(setName, allSets) && addNewWorkout(setName)}
                     </TabContent>
                 </Col>
             </Row>
