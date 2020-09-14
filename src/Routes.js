@@ -5,6 +5,7 @@ import Login from "./containers/Login"
 import AppliedRoute from "./components/AppliedRoute";
 import Signup from "./containers/Signup";
 import Home from "./containers/Home";
+import Play from "./containers/Play";
 import Settings from "./containers/Settings";
 
 export default function Routes({ appProps }) {
@@ -16,8 +17,8 @@ export default function Routes({ appProps }) {
       <Route exact path="/settings">
         <Settings />
       </Route>
-      <Route exact path="/home">
-        <Home />
+      <Route exact path="/play/:set">
+        <Play />
       </Route>
       {/* <Route exact path="/notes/:id">
         <Notes />

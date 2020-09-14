@@ -42,7 +42,7 @@ function App(props) {
     !isAuthenticating && (
       <div className="App container">
         <Navbar bg="light" expand="lg" variant="light">
-            <Navbar.Brand href="/home"> PowerLift </Navbar.Brand>
+            <Navbar.Brand href="/"> PowerLift </Navbar.Brand>
             <Navbar.Toggle display="true" aria-controls="basic-navbar-nav" />
           <Navbar.Collapse className="justify-content-end">
             <Nav>

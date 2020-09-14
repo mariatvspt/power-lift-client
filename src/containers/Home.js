@@ -1,6 +1,8 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Dropdown, Card, Nav, Col, Row, TabContainer, TabContent, NavItem } from "react-bootstrap";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { useHistory } from "react-router-dom";
+import { MDBIcon } from 'mdbreact';
 // controllers
 import { confirmEditWorkoutSet, confirmDeleteWorkoutSet, onChangeEditWorkoutSetName, onClickEditSetButton, onClickDeleteSetButton, onSelectWorkoutSetTab } from "../controllers/DisplaySetsController.js";
 import { cancelEditWorkout, confirmEditWorkout, confirmDeleteWorkout, onChangeEditWorkoutName, onChangeEditWorkoutMeasure, onClickEditWorkoutButton, onClickDeleteWorkoutButton, includes, onSelectWorkoutMeasureType } from "../controllers/DisplayWorkoutsController.js"
@@ -17,6 +19,7 @@ import ConfirmDeleteModal from "../components/ConfirmDeleteModal.js";
 import "./Home.css"
 
 export default function Home() {
+    const history = useHistory();
     const [allSets, setAllSets] = useState([]);
     const [allData, setAllData] = useState({});
     const [key, setKey] = useState("");
@@ -158,7 +161,10 @@ export default function Home() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}>
-                            <Card className="WorkoutCard" key={"WorkoutCardKey"+provided["draggableProps"]["data-rbd-draggable-id"]}>
+                            <Card
+                                border={snapshot.isDragging && "dark"}
+                                className="WorkoutCard"
+                                key={"WorkoutCardKey"+provided["draggableProps"]["data-rbd-draggable-id"]}>
                                 {
                                     showEditWorkoutFields == provided["draggableProps"]["data-rbd-draggable-id"]
                                     ? <> {displayEditWorkoutFields(set, workoutName, workoutMeasure, provided["draggableProps"]["data-rbd-draggable-id"])} </>
@@ -309,7 +315,10 @@ export default function Home() {
                 <Col sm={9}>
                     { setSelected &&
                         <>
-                            <h2>Workouts</h2>
+                            <h2>
+                                {'Workouts \t'}
+                                <MDBIcon far icon="play-circle" type="button" onClick={e => history.push(`/play/${key}`)}/>
+                            </h2>
                             <Dropdown.Divider />
                         </>
                     }
